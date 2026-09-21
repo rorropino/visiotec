@@ -1,6 +1,8 @@
 export type SyncRecord = {
   linearId: string;
   githubNumber: number;
+  linearHash: string;
+  githubHash: string;
   lastLinearUpdatedAt: string;
   lastGithubUpdatedAt: string;
   lastSyncedAt: string;
