@@ -51,5 +51,6 @@ export async function updateGitHubIssue(
 }
 
 export async function listGitHubIssues(repo: string): Promise<GitHubIssue[]> {
-  const issues = await gh<GitHubIssue[]>(`/repos/${repo}/issues?state=all&per_page=100&sort=updated&direction=desc`);\n  return issues.filter((issue) => !issue.pull_request);
+  const issues = await gh<GitHubIssue[]>(`/repos/${repo}/issues?state=all&per_page=100&sort=updated&direction=desc`);
+  return issues.filter((issue) => !issue.pull_request);
 }
