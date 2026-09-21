@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {conflictWinner} from '../src/sync.js';
+const item=(updatedAt:string)=>({id:'1',title:'x',body:'',updatedAt,state:'open',labels:[]});
+test('one-sided Linear change wins',()=>assert.equal(conflictWinner(item('2026-09-21T10:00:00Z'),item('2026-09-20T10:00:00Z'),{linearId:'1',githubId:'1',lastLinear:'old',lastGithub:'2026-09-20T10:00:00Z'}),'linear'));
+test('one-sided GitHub change wins',()=>assert.equal(conflictWinner(item('2026-09-20T10:00:00Z'),item('2026-09-21T10:00:00Z'),{linearId:'1',githubId:'1',lastLinear:'2026-09-20T10:00:00Z',lastGithub:'old'}),'github'));
+test('simultaneous edits use latest timestamp',()=>assert.equal(conflictWinner(item('2026-09-21T11:00:00Z'),item('2026-09-21T10:00:00Z'),{linearId:'1',githubId:'1',lastLinear:'old',lastGithub:'old'}),'linear'));
