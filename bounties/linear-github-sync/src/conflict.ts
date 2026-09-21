@@ -2,12 +2,14 @@ import type { ConflictStrategy, SyncDecision, SyncRecord } from "./types.js";
 
 export function decideSync(
   record: SyncRecord,
+  linearHash: string,
+  githubHash: string,
   linearUpdatedAt: string,
   githubUpdatedAt: string,
   strategy: ConflictStrategy,
 ): SyncDecision {
-  const linearChanged = new Date(linearUpdatedAt) > new Date(record.lastLinearUpdatedAt);
-  const githubChanged = new Date(githubUpdatedAt) > new Date(record.lastGithubUpdatedAt);
+  const linearChanged = linearHash !== record.linearHash;
+  const githubChanged = githubHash !== record.githubHash;
 
   if (!linearChanged && !githubChanged) return { action: "noop" };
   if (linearChanged && !githubChanged) return { action: "linear-to-github" };
