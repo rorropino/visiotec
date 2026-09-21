@@ -1,0 +1,28 @@
+name: Linear-GitHub Sync CI
+
+on:
+  push:
+    paths:
+      - "bounties/linear-github-sync/**"
+      - ".github/workflows/linear-github-sync.yml"
+  pull_request:
+    paths:
+      - "bounties/linear-github-sync/**"
+      - ".github/workflows/linear-github-sync.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bounties/linear-github-sync
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: bounties/linear-github-sync/package-lock.json
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
