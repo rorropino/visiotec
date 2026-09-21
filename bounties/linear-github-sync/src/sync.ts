@@ -30,7 +30,7 @@ function chooseWinner(
   const liHash = canonicalHash(liCanonical);
 
   if (ghHash === liHash) return "same";
-  if (!marker) return new Date(gh.updated_at) >= new Date(li.updatedAt) ? "github" : "linear";
+  if (!marker) return new Date(gh.updated_at).getTime() >= new Date(li.updatedAt).getTime() ? "github" : "linear";
 
   const ghChanged = ghHash !== marker.hash;
   const liChanged = liHash !== marker.hash;
