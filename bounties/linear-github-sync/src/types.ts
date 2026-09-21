@@ -25,6 +25,7 @@ export interface GitHubIssue {
   body: string | null;
   state: "open" | "closed";
   updated_at: string;
+  pull_request?: unknown;
 }
 
 export interface LinearIssue {
