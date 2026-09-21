@@ -18,22 +18,35 @@ async function gql<T>(query: string, variables: Record<string, unknown> = {}): P
   return json.data;
 }
 
+const fields = "id identifier title description updatedAt state{ id type }";
+
 export async function getLinearIssue(id: string) {
   const data = await gql<{ issue: any }>(
-    `query($id:String!){ issue(id:$id){ id identifier title description updatedAt state{ type } } }`,
+    `query($id:String!){ issue(id:$id){ ${fields} } }`,
     { id },
   );
   return data.issue;
 }
 
+async function targetStateId(closed: boolean): Promise<string | undefined> {
+  const data = await gql<{ team: { states: { nodes: Array<{ id: string; type: string }> } } }>(
+    `query($id:String!){ team(id:$id){ states{ nodes{ id type } } } }`,
+    { id: config.linearTeamId() },
+  );
+  const wanted = closed ? ["completed", "canceled"] : ["started", "unstarted", "backlog"];
+  return data.team.states.nodes.find((state) => wanted.includes(state.type))?.id;
+}
+
 export async function createLinearIssue(issue: CanonicalIssue) {
+  const stateId = await targetStateId(issue.state === "closed");
   const data = await gql<{ issueCreate: { issue: any } }>(
-    `mutation($input:IssueCreateInput!){ issueCreate(input:$input){ issue{ id identifier title description updatedAt state{ type } } } }`,
+    `mutation($input:IssueCreateInput!){ issueCreate(input:$input){ issue{ ${fields} } } }`,
     {
       input: {
         teamId: config.linearTeamId(),
         title: issue.title,
         description: issue.body,
+        ...(stateId ? { stateId } : {}),
       },
     },
   );
@@ -41,13 +54,15 @@ export async function createLinearIssue(issue: CanonicalIssue) {
 }
 
 export async function updateLinearIssue(id: string, issue: CanonicalIssue) {
+  const stateId = await targetStateId(issue.state === "closed");
   const data = await gql<{ issueUpdate: { issue: any } }>(
-    `mutation($id:String!,$input:IssueUpdateInput!){ issueUpdate(id:$id,input:$input){ issue{ id identifier title description updatedAt state{ type } } } }`,
+    `mutation($id:String!,$input:IssueUpdateInput!){ issueUpdate(id:$id,input:$input){ issue{ ${fields} } } }`,
     {
       id,
       input: {
         title: issue.title,
         description: issue.body,
+        ...(stateId ? { stateId } : {}),
       },
     },
   );
@@ -56,7 +71,7 @@ export async function updateLinearIssue(id: string, issue: CanonicalIssue) {
 
 export async function listLinearIssues() {
   const data = await gql<{ team: { issues: { nodes: any[] } } }>(
-    `query($id:String!){ team(id:$id){ issues(first:100){ nodes{ id identifier title description updatedAt state{ type } } } } }`,
+    `query($id:String!){ team(id:$id){ issues(first:100){ nodes{ ${fields} } } } }`,
     { id: config.linearTeamId() },
   );
   return data.team.issues.nodes;
