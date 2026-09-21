@@ -1,0 +1,4 @@
+import {Octokit} from '@octokit/rest'; import type {Adapter,Item} from './sync.js';
+export class GitHubAdapter implements Adapter { private api:Octokit; constructor(token:string,private owner:string,private repo:string){this.api=new Octokit({auth:token})}
+ async get(id:string):Promise<Item>{const {data:x}=await this.api.issues.get({owner:this.owner,repo:this.repo,issue_number:Number(id)});return{id:String(x.number),title:x.title,body:x.body||'',updatedAt:x.updated_at,state:x.state,labels:x.labels.map((l:any)=>typeof l==='string'?l:l.name).filter(Boolean)}}
+ async update(id:string,p:Partial<Item>):Promise<Item>{await this.api.issues.update({owner:this.owner,repo:this.repo,issue_number:Number(id),title:p.title,body:p.body,state:p.state==='closed'?'closed':p.state==='open'?'open':undefined,labels:p.labels});return this.get(id)} }
