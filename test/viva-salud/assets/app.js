@@ -24,9 +24,9 @@
  async function refresh(){state.data=await api('dashboard');state.profile=state.data.profile;renderAll();}
  function setAuthMode(register){state.register=register;$('switch-login').classList.toggle('selected',!register);$('switch-register').classList.toggle('selected',register);$('auth-title').textContent=register?'Tu mejor versión comienza aquí.':'Qué bueno verte.';$('auth-submit').textContent=register?'Crear mi cuenta →':'Entrar a mi espacio →';document.querySelectorAll('.register-only').forEach(el=>el.hidden=!register);$('auth-name').required=register;$('auth-password').autocomplete=register?'new-password':'current-password';}
  function showApp(user){state.user=user;$('auth-screen').hidden=!!user;$('app').classList.toggle('is-hidden',!user);if(user)tab('inicio');}
- function tab(name) {if(!['inicio','entrenar','comer','progreso','perfil'].includes(name))return;state.tab=name;document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));$('current-tab-title').textContent={inicio:'MI DÍA',entrenar:'ENTRENAR',comer:'ALIMENTACIÓN',progreso:'MI EVOLUCIÓN',perfil:'MI PLAN'}[name];window.scrollTo({top:0,behavior:'smooth'});}
+ function tab(name) {if(!['inicio','entrenar','comer','progreso','perfil'].includes(name))return;if(state.tab==='entrenar' && name!=='entrenar' && state.trainer?.playing){stopTick();renderCoach();}state.tab=name;document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));$('current-tab-title').textContent={inicio:'MI DÍA',entrenar:'ENTRENAR',comer:'ALIMENTACIÓN',progreso:'MI EVOLUCIÓN',perfil:'MI PLAN'}[name];window.scrollTo({top:0,behavior:'smooth'});if(name==='entrenar'&&state.data&&!state.trainer)startCoach(true);}
  function renderAll(){const d=state.data;if(!d)return;const p=d.profile;
-  $('welcome-name').textContent=shortName(p.display_name);$('go-profile').textContent=(p.display_name||'V').trim()[0].toUpperCase();
+  $('welcome-name').textContent=shortName(p.display_name);$('sidebar-user-name').textContent=shortName(p.display_name);$('sidebar-user-avatar').textContent=String(p.display_name||'V')[0].toUpperCase();$('sidebar-user-detail').textContent=({principiante:'Iniciando',intermedio:'Nivel intermedio',avanzado:'Nivel avanzado'})[p.experience]||'Tu plan personal';$('go-profile').textContent=(p.display_name||'V').trim()[0].toUpperCase();
   $('today-caption').textContent=new Intl.DateTimeFormat('es-CL',{weekday:'short',day:'numeric',month:'short',timeZone:'America/Santiago'}).format(new Date());
   const latest=d.measurements.length?d.measurements[d.measurements.length-1]:null;
   const weight=latest?latest.weight_kg:p.weight_kg;
@@ -42,8 +42,8 @@
   $('today-workout-copy').textContent=d.plan.type+': una sesión guiada con movimientos de tu nivel.';
   $('today-workout-time').textContent=d.plan.approx_minutes;$('today-workout-rounds').textContent=d.plan.rounds;
   $('today-food-suggestion').textContent=d.recipes.length && d.pantry.length?d.recipes[0].name+' · '+d.recipes[0].time+' minutos':'Añade tus ingredientes para descubrir qué cocinar.';
-  $('train-type').textContent=d.plan.type;$('train-minutes').textContent=d.plan.approx_minutes;$('train-rounds').textContent=d.plan.rounds;$('train-exercises').textContent=d.plan.exercises.length;$('train-level').textContent=p.experience.toUpperCase();
-  $('exercise-items').innerHTML=d.plan.exercises.map((e,i)=>'<div class="exercise-item"><div class="exercise-emoji">'+(e.id==='sentadilla'||e.id==='pared'||e.id==='puente'||e.id==='bird'||e.id==='marcha' ? '<span aria-hidden="true" class="exercise-sprite-mini" style="background-position:0% '+({sentadilla:25,pared:50,puente:75,bird:100,marcha:0}[e.id])+'%"></span>':exerciseIcon(e.id))+'</div><div><strong>'+String(i+1).padStart(2,'0')+' · '+esc(e.name)+'</strong><small>'+esc(e.muscle)+'</small><p>'+esc(e.tip)+'</p></div></div>').join('');
+  $('train-type').textContent=d.plan.type;$('train-minutes').textContent=d.plan.approx_minutes;$('train-rounds').textContent=d.plan.rounds;$('train-level').textContent=p.experience.toUpperCase();
+  renderStudio(d,weekly,weight);
   const h=d.habits.find(x=>x.day===today())||{water:0,sleep:null};$('water-count').textContent=h.water;$('sleep-hours').value=h.sleep??'';
   $('habit-constancy').textContent=weekly?weekly+' sesión'+(weekly===1?'':'es')+' esta semana. ¡Bien ahí!':'La primera sesión de la semana puede ser hoy.';
   $('pantry-count').textContent=d.pantry.length+' ingredientes';
@@ -57,7 +57,67 @@
   renderChart(d.measurements);
   $('workout-history').innerHTML=d.workouts.length?d.workouts.map(w=>'<div class="history-item"><div><strong>✳ '+esc(w.type)+'</strong><p>'+esc(niceDate(w.day))+' · '+w.minutes+' min</p></div><span>Esfuerzo '+w.rpe+'/10</span></div>').join(''):'<div class="empty-state">Aún no hay entrenamientos registrados. ¡Tu primera sesión te está esperando!</div>';
   fillProfile(p);
+  if(state.tab==='entrenar'&&!state.trainer)startCoach(true);
  }
+ function studioExercisePreview(id){
+  const rows={marcha:0,sentadilla:25,pared:50,puente:75,bird:100};
+  if(Object.prototype.hasOwnProperty.call(rows,id))return '<span class="exercise-sprite-mini" aria-hidden="true" style="background-position:0% '+rows[id]+'%"></span>';
+  return exerciseIcon(id);
+ }
+ function studioStepList(){
+  const d=state.data,plan=d.plan,t=state.trainer;
+  const steps=[{name:'Activación suave',detail:plan.warmup+' min · Marcha y movilidad',id:'marcha',step:0}];
+  plan.exercises.forEach((e,i)=>{
+   const idx=t?.segments.findIndex(x=>x.exercise===e.name)??-1;
+   steps.push({name:e.name,detail:e.muscle+' · '+plan.seconds+' segundos',id:e.id,step:Math.max(0,idx),muscle:e.muscle});
+  });
+  steps.push({name:'Vuelta a la calma',detail:plan.cooldown+' min · Movimiento lento',id:'marcha',step:(t?.segments.length??1)-1});
+  return steps;
+ }
+ function renderStudio(d,weekly,weight){
+  const p=d.profile,logs=d.workouts||[],measures=d.measurements||[];
+  $('studio-goal').textContent=goalNames[p.goal]||'Bienestar';
+  $('studio-plan-goal').textContent=goalNames[p.goal]||'Bienestar';
+  $('studio-days').textContent=p.weekly_days;
+  $('studio-done').textContent=weekly;
+  $('studio-ex-count').textContent=d.plan.exercises.length;
+  $('studio-total-sessions').textContent=logs.length;
+  $('studio-weight').textContent=weight!==null && weight!=='' && Number.isFinite(+weight)?money(weight)+' kg':'Sin registro';
+  $('studio-target').textContent=p.target_kg?money(p.target_kg)+' kg':'Sin definir';
+  const recipe=d.recipes?.[0],lastMeal=d.meals?.find(m=>m.day===today());
+  $('studio-food-name').textContent=lastMeal?'Registraste: '+lastMeal.description:recipe?'Idea para hoy: '+recipe.name:'Explora recetas según tu despensa';
+  const h=d.habits.find(x=>x.day===today())||{water:0};
+  const water=Math.max(0,Number(h.water)||0);
+  $('studio-water').textContent=water+' vasos';
+  $('studio-water-dots').innerHTML=Array.from({length:8},(_,i)=>'<i class="'+(i<Math.min(water,8)?'filled':'')+'"></i>').join('');
+  $('studio-weight-foot').textContent=measures.length>1?'Datos obtenidos de tus mediciones registradas':'Sin estimaciones ni métricas inventadas';
+  const chart=$('studio-weight-chart');
+  if(measures.length>=2){
+   const m=measures.slice(-16),v=m.map(x=>Number(x.weight_kg)),min=Math.min(...v)-.7,max=Math.max(...v)+.7;
+   const pts=v.map((y,i)=>(8+i/(v.length-1)*272).toFixed(2)+','+(82-(y-min)/(max-min)*71).toFixed(2)).join(' ');
+   chart.innerHTML='<svg role="img" aria-label="Tendencia de peso según tus registros" viewBox="0 0 290 95" preserveAspectRatio="none"><defs><linearGradient id="studio-chart-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#68fa79" stop-opacity=".3"/><stop offset="1" stop-color="#68fa79" stop-opacity="0"/></linearGradient></defs><path d="M8,86L282,86" stroke="#52617a" stroke-width="1"/><polygon points="8,86 '+pts+' 280,86" fill="url(#studio-chart-fill)"/><polyline points="'+pts+'" fill="none" stroke="#7af76b" stroke-width="3" stroke-linejoin="round"/></svg>';
+  }else{chart.innerHTML='<p>Necesitas dos mediciones para visualizar el progreso.</p>';}
+  renderStudioRoutine();
+ }
+ function renderStudioRoutine(){
+  if(!state.data)return;
+  const t=state.trainer,list=studioStepList(),active=t?.index??0;
+  $('exercise-items').innerHTML=list.map((x,i)=>{
+    const next=list[i+1]?.step??Number.POSITIVE_INFINITY;
+    const current=t?.segments[t.index];const same=current?.exercise && current.exercise===x.name;const cls=t?(same || (active>=x.step && active<next)?' active':x.step<active?' done':''):'';
+    const done=t && x.step<active;
+    return '<button type="button" class="studio-routine-step '+cls+'" data-studio-step="'+x.step+'"><span class="studio-step-icon">'+studioExercisePreview(x.id)+'</span><span class="studio-step-name"><strong>'+esc(x.name)+'</strong><small>'+esc(x.detail)+'</small></span><span class="studio-step-state">'+(done?'✓':cls?'●':'')+'</span></button>';
+  }).join('');
+  const upcoming=state.data.plan.exercises.map(e=>({e,index:t?.segments.findIndex(x=>x.exercise===e.name)??-1})).filter(({index})=>index>=(t?.index??0)).slice(0,4);
+  $('studio-upcoming').innerHTML=upcoming.length?upcoming.map(({e,index})=>'<button class="studio-upcoming-tile" type="button" data-studio-step="'+index+'"><span class="studio-up-preview">'+studioExercisePreview(e.id)+'</span><span><strong>'+esc(e.name)+'</strong><small>'+esc(e.muscle)+'</small></span></button>').join(''):'<div class="muted-note">Último tramo de la rutina. ¡Casi terminas!</div>';
+ }
+ function jumpToStudioStep(index){
+  const t=state.trainer;if(!t||!Number.isInteger(index)||index<0||index>=t.segments.length)return;
+  if(t.playing)stopTick();
+  t.index=index;t.remaining=t.segments[index].seconds;t.started=true;
+  renderCoach();renderStudioRoutine();speak(t.segments[index].title);
+ }
+
  function updateVisualInsights(d,weekly,weight){
   const p=d.profile;
   $('focus-weight').textContent=Number.isFinite(Number(weight))&&weight!==null&&weight!==''?money(weight):'—';
@@ -111,7 +171,7 @@
  function speak(s){if(!$('coach-voice').checked||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='es-CL';u.rate=1;u.pitch=1;speechSynthesis.speak(u);}catch(e){}}
  function buildSegments(plan){let seg=[{phase:'Calentamiento',title:'Calentamiento: marcha suave',icon:'🌤',tip:'Marcha en tu lugar alternando rodillas y brazos a ritmo cómodo. Después mueve suavemente los hombros. Debes poder conversar y respirar con normalidad.',seconds:plan.warmup*60}];for(let round=1;round<=plan.rounds;round++){plan.exercises.forEach((e,i)=>{seg.push({phase:'RONDA '+round+' / '+plan.rounds,title:e.name,icon:e.icon,tip:e.tip+' Alternativa: '+e.easy,seconds:plan.seconds,exercise:e.name});if(round!==plan.rounds||i!==plan.exercises.length-1)seg.push({phase:'RECUPERACIÓN',title:'Descansa y respira',icon:'◷',tip:'Suelta los hombros y toma aire. Si lo necesitas, alarga la pausa.',seconds:plan.rest});});}
  seg.push({phase:'VUELTA A LA CALMA',title:'Vuelta a la calma: marcha lenta',icon:'🌿',tip:'Camina despacio y reduce el ritmo gradualmente. Respira sin forzar. Si estiras, hazlo suave y sin dolor.',seconds:plan.cooldown*60});return seg;}
- function startCoach(){if(!state.data)return;window.VivaSprite?.start('coach-sprite');const p=state.data.plan;state.trainer={segments:buildSegments(p),index:0,remaining:0,playing:false,timer:null,started:false,activeSeconds:0,lastTick:null};state.trainer.remaining=state.trainer.segments[0].seconds;$('coach-overlay').hidden=false;$('coach-complete').hidden=true;$('coach-body')?.removeAttribute('hidden');renderCoach();beep();}
+ function startCoach(silent=false){if(!state.data)return;if(state.trainer)stopTick();window.VivaSprite?.stop();window.VivaSprite?.start('coach-sprite');const p=state.data.plan;state.trainer={segments:buildSegments(p),index:0,remaining:0,playing:false,timer:null,started:false,activeSeconds:0,lastTick:null};state.trainer.remaining=state.trainer.segments[0].seconds;$('coach-overlay').hidden=false;$('coach-complete').hidden=true;$('coach-body')?.removeAttribute('hidden');renderCoach();renderStudioRoutine();if(!silent){beep();$('coach-stage').scrollIntoView({block:'start',behavior:'instant'});}}
  function renderCoach(){const t=state.trainer;if(!t)return;const seg=t.segments[t.index];
    const demo=$('coach-demo');
    const name=String(seg.exercise||'').toLowerCase();
@@ -129,6 +189,8 @@
    if(seg.phase==='RECUPERACIÓN')mode='rest';
    if(seg.phase==='VUELTA A LA CALMA'||seg.phase==='Calentamiento')mode='march';
    const sprite=window.VivaSprite?.hasMode(mode);
+   const info=$('studio-technique'),tip=$('studio-technique-text');
+   if(info&&tip){info.hidden=seg.phase==='RECUPERACIÓN';tip.textContent=String(seg.tip||'').split(' Alternativa:')[0];}
    const canvas=$('coach-sprite');
    const rest=$('coach-rest-visual');
    const showRest=mode==='rest';
@@ -144,7 +206,11 @@
      if(demo.dataset.source!==url){demo.dataset.source=url;demo.src=url;demo.load();}
      if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)demo.play().catch(()=>{});
    }
-   $('coach-next-list').innerHTML=t.segments.slice(t.index,t.index+4).map((x,i)=>'<span class="'+(i===0?'active':'')+'">'+esc(x.title)+'</span>').join('');
+   if(t.lastRenderedIndex!==t.index){
+     $('coach-next-list').innerHTML=t.segments.slice(t.index,t.index+4).map((x,i)=>'<span class="'+(i===0?'active':'')+'">'+esc(x.title)+'</span>').join('');
+     t.lastRenderedIndex=t.index;
+     renderStudioRoutine();
+   }
  const mm=String(Math.floor(Math.ceil(t.remaining)/60)).padStart(2,'0');const ss=String(Math.ceil(t.remaining)%60).padStart(2,'0');$('coach-timer').textContent=mm+':'+ss;$('coach-phase').textContent=seg.phase;$('coach-title').textContent=seg.title;$('coach-icon').innerHTML=uiIcon(seg.exercise?'activity':'sparkles');$('coach-tip').textContent=seg.tip;$('coach-position').textContent='Paso '+(t.index+1)+' de '+t.segments.length;$('coach-progress-fill').style.width=((t.index+(1-t.remaining/seg.seconds))/t.segments.length*100).toFixed(1)+'%';$('coach-play').textContent=t.playing?'Ⅱ Pausar':(t.started?'▶ Continuar':'▶ Iniciar');}
  function stopTick(){const t=state.trainer;if(t){clearInterval(t.timer);t.timer=null;t.playing=false;}if('speechSynthesis' in window){try{speechSynthesis.cancel();}catch(e){}}}
  function tick(){const t=state.trainer;if(!t||!t.playing)return;const now=performance.now();const diff=Math.max(0,(now-t.lastTick)/1000);t.lastTick=now;t.remaining-=diff;t.activeSeconds+=diff;
@@ -154,11 +220,16 @@
  function nextCoach(auto=false){const t=state.trainer;if(!t)return;const play=t.playing;clearInterval(t.timer);t.timer=null;t.index++;if(t.index>=t.segments.length){finishCoach();return;}t.remaining=t.segments[t.index].seconds;t.playing=false;if(play){t.playing=true;t.lastTick=performance.now();t.timer=setInterval(tick,180);}beep();renderCoach();if(play)speak(t.segments[t.index].title);}
  function prevCoach(){const t=state.trainer;if(!t)return;const play=t.playing;clearInterval(t.timer);t.index=Math.max(0,t.index-1);t.remaining=t.segments[t.index].seconds;t.playing=play;if(play){t.lastTick=performance.now();t.timer=setInterval(tick,180);}renderCoach();}
  function finishCoach(){const t=state.trainer;if(!t)return;stopTick();window.VivaSprite?.stop();$('coach-demo').pause();$('coach-body').hidden=true;$('coach-complete').hidden=false;beep();speak('¡Excelente trabajo! Finalizaste la sesión.');}
- function exitCoach(){stopTick();$('coach-demo').pause();window.VivaSprite?.stop();state.trainer=null;$('coach-overlay').hidden=true;$('coach-body').hidden=false;}
+ function exitCoach(){stopTick();$('coach-demo').pause();window.VivaSprite?.stop();state.trainer=null;$('coach-overlay').hidden=true;$('coach-body').hidden=false;if(state.tab==='entrenar')tab('inicio');}
  async function saveCoach(){const t=state.trainer;if(!t||t.activeSeconds<45){toast('Para guardar necesitas haber entrenado al menos 45 segundos.',true);return;}
   try{await api('workout',{rpe:Number($('coach-rpe').value),minutes:Math.max(1,Math.round(t.activeSeconds/60)),type:state.data.plan.type,exercises:state.data.plan.exercises.map(x=>x.name)});exitCoach();await refresh();toast('¡Sesión registrada! Tu próximo plan se adaptará.');tab('inicio');}catch(e){toast(e.message,true);}
  }
  function wire(){
+  const stage=$('coach-stage'), overlay=$('coach-overlay');
+  if(stage&&overlay){stage.replaceChildren(overlay);}
+  $('train-goal-open').onclick=()=>tab('perfil');
+  $('studio-water-add').onclick=()=>{const h=state.data?.habits?.find(x=>x.day===today());saveHabit({water:Math.min(20,(Number(h?.water)||0)+1)});};
+  $('view-entrenar').addEventListener('click',ev=>{const b=ev.target.closest('[data-studio-step]');if(b)jumpToStudioStep(Number(b.dataset.studioStep));});
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));
   $('go-profile').onclick=()=>tab('perfil');
   document.querySelectorAll('[data-goal-jump]').forEach(el=>el.addEventListener('click',()=>{tab('perfil');const goal=document.querySelector('input[name="goal"][value="'+el.dataset.goalJump+'"]');if(goal){goal.checked=true;goal.closest('.choice-card').scrollIntoView({behavior:'smooth',block:'center'});toast('Objetivo seleccionado. Guarda tu plan para aplicarlo.');}}));
@@ -174,7 +245,7 @@
   $('water-minus').onclick=()=>{const h=state.data.habits.find(x=>x.day===today());saveHabit({water:Math.max(0,(Number(h?.water)||0)-1)});};
   $('water-plus').onclick=()=>{const h=state.data.habits.find(x=>x.day===today());saveHabit({water:Math.min(20,(Number(h?.water)||0)+1)});};
   $('sleep-save').onclick=()=>saveHabit({sleep:$('sleep-hours').value===''?null:Number($('sleep-hours').value)});
-  $('open-coach').onclick=startCoach;$('coach-exit').onclick=exitCoach;$('coach-play').onclick=playPause;$('coach-next').onclick=()=>nextCoach(false);$('coach-prev').onclick=prevCoach;$('coach-discard').onclick=exitCoach;$('coach-save').onclick=saveCoach;
+  $('open-coach').onclick=()=>startCoach(false);$('coach-exit').onclick=exitCoach;$('coach-play').onclick=playPause;$('coach-next').onclick=()=>nextCoach(false);$('coach-prev').onclick=prevCoach;$('coach-discard').onclick=exitCoach;$('coach-save').onclick=saveCoach;
   $('coach-rpe').oninput=()=>$('coach-rpe-label').textContent=$('coach-rpe').value;
   $('export-data').onclick=async()=>{try{const data=await api('export');const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='viva-salud-mis-datos-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('Exportación descargada.');}catch(e){toast(e.message,true);}};
   $('delete-account').onclick=async()=>{if(!confirm('¿Eliminar DEFINITIVAMENTE tu cuenta y todos tus datos?'))return;const pass=$('delete-password').value;if(!pass){toast('Escribe tu contraseña para confirmar.',true);return;}try{const data=await api('delete_account',{password:pass});state.csrf=data.csrf;state.user=null;state.data=null;state.profile=null;showApp(null);toast('Cuenta y datos eliminados.');}catch(e){toast(e.message,true);}};

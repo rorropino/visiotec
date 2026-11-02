@@ -1,0 +1,200 @@
+/* Viva la Salud PRO · Studio workout screen — dashboard, not dialog */
+#view-entrenar.training-dashboard{padding:0}
+.training-dashboard .studio-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 21px;padding:6px 0}
+.studio-kicker{display:flex;align-items:center;gap:13px;color:#a9f67d;font-size:12px;font-weight:800;letter-spacing:.13em}
+.studio-kicker .ui-icon{height:35px;width:35px;color:#83fb64}
+.studio-heading h1{font-size:clamp(34px,3.5vw,54px);line-height:1.06;letter-spacing:-.055em;margin:6px 0 6px;color:#f7faff}
+.studio-heading p{font-size:13px;margin:0;color:#b7c2d1}
+.studio-heading p strong{color:white}
+.studio-level{color:#beff81;background:#244a36;border:1px solid #7af26775;padding:4px 9px;border-radius:99px;font-weight:800;font-size:10px}
+.studio-goal-pill{min-width:205px;max-width:310px;display:flex;align-items:center;gap:12px;text-align:left;border:1px solid #74799888;background:linear-gradient(135deg,#2b3150,#1c233c);border-radius:15px;color:white;padding:13px 15px;box-shadow:inset 0 1px #ffffff12}
+.studio-goal-pill .ui-icon{color:#d1f8cd;height:25px;width:25px}
+.studio-goal-pill span:nth-child(2){flex:1}
+.studio-goal-pill small{display:block;font-size:9px;letter-spacing:.07em;color:#aab8cb;margin-bottom:4px}
+.studio-goal-pill strong{font-size:12px;display:block}
+.studio-goal-pill>span:last-child{font-size:22px;color:#b1f88b}
+.studio-grid{display:grid;grid-template-columns:minmax(195px,235px) minmax(0,1fr) minmax(225px,276px);grid-template-areas:"list coach right";align-items:start;gap:13px}
+.studio-routine,.studio-side-card,.studio-coach-stage,.studio-up-next{border:1px solid #66729685;background:linear-gradient(147deg,#151e31,#111927);box-shadow:0 11px 36px #0005,inset 0 1px #ffffff09;border-radius:19px}
+.studio-routine{grid-area:list;padding:17px 10px 14px;align-self:stretch;min-height:625px}
+.studio-card-title,.studio-side-head,.studio-up-header{display:flex;justify-content:space-between;align-items:center;gap:7px}
+.studio-card-title{padding:2px 8px}
+.studio-card-title h2{font-size:19px;margin:0;color:#fff}
+.studio-card-title span{font-size:10px;color:#cdd9e5}
+.studio-routine-note{font-size:11px;color:#a6b5ca;padding:0 8px;margin:5px 0 14px}
+.studio-exercise-list{display:grid;gap:6px}
+.studio-routine-step{display:flex;align-items:center;gap:8px;width:100%;background:#202b3e91;border:1px solid #55657d66;border-radius:11px;min-height:55px;padding:8px;text-align:left;color:#d7deeb;transition:.15s}
+.studio-routine-step:hover{border-color:#a6f48a;color:#fff}
+.studio-routine-step.active{border-color:#8be96e;background:linear-gradient(130deg,#25543d,#233c2f);box-shadow:inset 0 0 0 1px #a4f88b44,0 0 18px #96ee6c13;color:#fff}
+.studio-routine-step.done{background:#1e392e88;border-color:#4a8557aa}
+.studio-routine-step:disabled{cursor:default}
+.studio-step-icon{display:grid;place-items:center;background:#1b2634;border-radius:9px;width:37px;height:40px;flex:0 0 37px;overflow:hidden}
+.studio-step-icon .exercise-sprite-mini{width:37px;height:40px}
+.studio-step-icon .ui-icon{color:#c4ffae}
+.studio-step-name{min-width:0;flex:1}
+.studio-step-name strong{display:block;font-weight:750;font-size:11px;line-height:1.35}
+.studio-step-name small{display:block;color:#a1b4c3;font-size:10px;line-height:1.25;margin-top:4px}
+.studio-step-state{font-size:13px;font-weight:900;color:#b3f98f}
+.studio-restart{margin-top:13px;padding:10px 9px;width:100%;border:1px dashed #7a8e98;background:#212c3f;color:#d6e0ec;border-radius:12px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}
+.studio-restart .ui-icon{width:15px;height:15px}
+.studio-main{grid-area:coach;min-width:0}
+.studio-coach-stage{min-height:590px;padding:0;overflow:hidden;background:linear-gradient(170deg,#181c2f,#0f1520 88%);border-color:#7481a4}
+.studio-stage-placeholder{font-size:13px;text-align:center;color:#a5b5bf;padding:80px 20px}
+.studio-coach-stage>.coach-overlay{position:static;inset:auto;z-index:auto;width:100%;display:block;padding:0;background:transparent;backdrop-filter:none;min-height:0}
+.studio-coach-stage>.coach-overlay[hidden]{display:none!important}
+.studio-coach-stage .coach-modal{min-height:0;max-height:none;height:auto;max-width:none;width:100%;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.studio-coach-stage .studio-coach-top{display:flex;padding:12px 19px;background:#0e1726aa;min-height:55px;border-color:#ffffff19}
+.studio-coach-stage .studio-coach-top .brand-mark{width:30px;height:30px;font-size:17px;letter-spacing:-2px;border-radius:8px}
+.studio-coach-stage .studio-coach-top .brand-mark span{font-size:12px;padding-top:2px}
+.studio-coach-stage .studio-coach-top .brand strong{font-size:13px}
+.studio-coach-stage .studio-coach-top .brand small{font-size:7px}
+.studio-coach-stage .close-coach{font-size:10px;padding:7px 10px}
+.studio-coach-stage .coach-body{display:flex;flex-direction:column;align-items:stretch;overflow:visible;min-height:0;padding:13px 15px 17px;text-align:left}
+.studio-coach-stage .coach-body>.eyebrow{order:0;font-size:10px;margin:0 0 5px;color:#b8fa80;letter-spacing:.17em}
+.studio-coach-stage .coach-body>h2{order:1;font-size:clamp(23px,2vw,34px);line-height:1.12;margin:0;color:#f4f9ff}
+.studio-coach-stage .coach-body>p{order:2;text-align:left;font-size:11px;color:#afc2d0;margin:6px 0 10px;line-height:1.5;max-width:none;min-height:34px}
+.studio-coach-stage .coach-progress-track{order:3;height:5px;margin:0 0 12px;background:#3a415b}
+.studio-coach-stage .coach-demonstration{order:4;width:100%;height:318px;min-height:0;margin:0;border-radius:12px 12px 0 0;border:1px solid #606e8688;border-bottom:0;background:linear-gradient(110deg,#111826,#1d2341,#151e2e);box-shadow:none;flex-shrink:0}
+.studio-coach-stage .coach-demonstration .demo-overlay{top:12px;left:11px;right:11px}
+.studio-coach-stage .video-tag{font-size:8px;letter-spacing:.08em}
+.studio-coach-stage .coach-exercise-icon{width:35px;height:35px}
+.studio-coach-stage .studio-controls-bottom{order:5;border:1px solid #64769599;border-top:0;border-radius:0 0 14px 14px;background:linear-gradient(105deg,#111b2a,#101a2b);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px}
+.studio-clock-circle{height:103px;width:103px;min-width:103px;border-radius:100px;border:7px solid #a6f967;background:#111a27;box-shadow:0 0 0 5px #6787883c;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.studio-clock-circle .coach-clock{font-family:Outfit;font-size:29px;letter-spacing:-.045em;line-height:1.2;margin:0;white-space:nowrap;color:white}
+.studio-clock-circle span{font-size:7px;letter-spacing:.05em;color:#b4c6d5;line-height:1.2}
+.studio-motion-details{flex:1;min-width:0}
+.studio-coach-stage .coach-position{font-size:10px;letter-spacing:.02em;color:#d1dce8}
+.studio-coach-stage .coach-actions{display:flex;position:static;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:0;margin:9px 0 0;background:none;border:0}
+.studio-coach-stage .coach-actions .btn{padding:10px 10px;flex:1;border-radius:26px;font-size:11px;min-width:0;white-space:nowrap}
+.studio-coach-stage .coach-actions .btn-lime{flex:1.3;color:#183322}
+.studio-coach-stage .voice-toggle{font-size:10px;text-align:left;margin:8px 0 0!important}
+.studio-coach-stage .coach-next-list{order:6;display:none}
+.studio-coach-stage .coach-visual-note{order:7;font-size:9px;color:#899da8;text-align:left;margin:9px 0 0}
+.studio-coach-stage .coach-complete{padding:40px 23px;min-height:420px}
+.studio-coach-stage .coach-sprite{height:100%;width:100%}
+.studio-up-next{padding:13px 14px;margin-top:12px}
+.studio-up-header h3{font-size:14px;margin:0}
+.studio-up-header span{font-size:9px;color:#95b6a6}
+.studio-upcoming-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.studio-upcoming-tile{border:1px solid #55667caa;background:linear-gradient(125deg,#253047,#1b2534);border-radius:11px;padding:8px;display:flex;align-items:center;gap:8px;min-width:0;color:#fff;text-align:left}
+.studio-upcoming-tile:hover{border-color:#b5ff84}
+.studio-upcoming-tile .studio-up-preview{height:48px;width:45px;flex:0 0 45px;display:grid;place-items:center;background:#171a2b;border-radius:7px;overflow:hidden}
+.studio-up-preview .exercise-sprite-mini{height:48px;width:45px}
+.studio-up-preview .ui-icon{color:#d0fabe;width:24px;height:24px}
+.studio-upcoming-tile strong{display:block;font-size:10px;line-height:1.2}
+.studio-upcoming-tile small{display:block;color:#aebdd0;font-size:9px;margin-top:5px}
+.studio-aside{grid-area:right;display:grid;gap:12px;min-width:0}
+.studio-side-card{padding:17px 16px;background:linear-gradient(144deg,#181f30,#111825);min-width:0}
+.studio-side-head{margin-bottom:14px}
+.studio-side-head h3{font-size:17px;letter-spacing:-.025em;margin:0}
+.studio-text-link{border:0;background:transparent;color:#adf887;font-size:11px;font-weight:750;padding:0}
+.studio-weight-line{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.studio-weight-line span{display:flex;flex-direction:column;gap:4px}
+.studio-weight-line span+span{border-left:1px solid #77829c69;padding-left:11px}
+.studio-weight-line small{font-size:8px;letter-spacing:.05em;color:#96a8bb}
+.studio-weight-line strong{font-size:23px;font-family:Outfit;font-weight:800;white-space:nowrap}
+.studio-side-chart{height:95px;margin-top:13px;border-bottom:1px solid #35485a}
+.studio-side-chart svg{height:100%;width:100%}
+.studio-side-chart p{font-size:11px;line-height:1.4;margin:10px 0;color:#94a7b7}
+.studio-progress-foot{font-size:10px;color:#93a6b9;line-height:1.4;margin-top:9px}
+.studio-plan-line{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff14;color:#d7e4f1;font-size:11px}
+.studio-plan-line:last-child{border-bottom:0}
+.studio-plan-line .ui-icon{height:18px;width:18px;color:#aff88c}
+.studio-nutrition>img{width:100%;height:108px;object-fit:cover;border-radius:12px;border:1px solid #42516b}
+.studio-nutrition>p{font-size:11px;margin:8px 0 13px;color:#d8e5ed}
+.studio-hydration{padding-top:12px;border-top:1px solid #ffffff27}
+.studio-hydration-head{display:flex;justify-content:space-between;align-items:center;gap:5px;font-size:11px}
+.studio-hydration-head>span{display:flex;align-items:center;gap:5px}
+.studio-hydration-head .ui-icon{height:16px;width:16px;color:#62c7ff}
+.studio-water-dots{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:11px 0 10px}
+.studio-water-dots i{height:8px;background:#2e3d56;border-radius:100px}
+.studio-water-dots i.filled{background:linear-gradient(90deg,#49bbff,#95effe);box-shadow:0 0 7px #7cd8ff77}
+.studio-footer-goal{margin-top:16px;min-height:102px;border:1px solid #8b59c6c2;border-radius:18px;background:linear-gradient(105deg,#4b2b8f,#241f56 50%,#43306c);display:flex;align-items:center;gap:15px;padding:18px 24px;position:relative;overflow:hidden}
+.studio-footer-goal:after{content:"";position:absolute;right:12%;top:-84px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#ac7afb44,transparent 67%);pointer-events:none}
+.studio-footer-symbol{font-size:44px;color:#e4fb70}
+.studio-footer-goal>div:first-of-type{flex:1;position:relative;z-index:1}
+.studio-footer-goal h3{font-size:19px;margin:0 0 4px}
+.studio-footer-goal p{font-size:12px;margin:0;color:#d8d0f4}
+.studio-footer-summary{display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.studio-footer-summary strong{font-size:34px;color:#c8ff93}
+.studio-footer-summary span{max-width:95px;font-size:10px;color:#e0d8f4}
+.studio-footer-goal .btn{position:relative;z-index:1}
+.studio-safety{font-size:11px;color:#91a4b3;line-height:1.6;margin:13px 0 0}
+/* Custom stack to preserve mock's three columns on laptop and desktop */
+@media(max-width:1450px){
+ .studio-grid{grid-template-columns:minmax(180px,208px) minmax(0,1fr) minmax(205px,245px);gap:10px}
+ .studio-clock-circle{height:86px;width:86px;min-width:86px}
+ .studio-clock-circle .coach-clock{font-size:24px}
+ .studio-upcoming-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .studio-coach-stage .coach-demonstration{height:260px}
+ .studio-coach-stage .coach-actions .btn{padding:9px 7px;font-size:10px}
+}
+@media(max-width:1130px){
+ .studio-grid{grid-template-columns:210px minmax(0,1fr);grid-template-areas:"list coach" "right right"}
+ .studio-aside{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .studio-routine{min-height:0}
+ .studio-coach-stage .coach-demonstration{height:335px}
+ .studio-upcoming-list{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:800px){
+ .training-dashboard .studio-heading{align-items:flex-start}
+ .studio-heading h1{font-size:37px}
+ .studio-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"coach" "list" "right"}
+ .studio-routine{padding:17px}
+ .studio-aside{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .studio-aside .studio-nutrition{grid-column:span 2}
+ .studio-coach-stage .coach-demonstration{height:330px}
+ .studio-upcoming-list{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .studio-footer-goal{flex-wrap:wrap}
+}
+@media(max-width:560px){
+ .training-dashboard .studio-heading{display:flex;flex-direction:column;margin:0 0 13px;gap:10px}
+ .studio-heading h1{font-size:34px}
+ .studio-heading p{font-size:11px}
+ .studio-goal-pill{max-width:none;width:100%;padding:10px}
+ .studio-grid{gap:12px}
+ .studio-coach-stage .coach-modal{height:auto;max-height:none;min-height:0}
+ .studio-coach-stage .coach-body{padding:10px 9px 12px;overflow:visible;display:flex}
+ .studio-coach-stage .studio-coach-top{padding:8px 12px}
+ .studio-coach-stage .coach-demonstration{height:225px;min-height:0}
+ .studio-coach-stage .coach-body>h2{font-size:24px}
+ .studio-coach-stage .coach-body>p{font-size:10px;min-height:0}
+ .studio-coach-stage .studio-controls-bottom{padding:10px 8px;gap:9px}
+ .studio-clock-circle{height:75px;width:75px;min-width:75px;border-width:5px}
+ .studio-clock-circle .coach-clock{font-size:21px}
+ .studio-clock-circle span{font-size:6px}
+ .studio-coach-stage .coach-actions{margin:5px 0 0;gap:4px}
+ .studio-coach-stage .coach-actions .btn{padding:9px 4px;font-size:10px}
+ .studio-coach-stage .coach-position{font-size:9px}
+ .studio-coach-stage .voice-toggle{font-size:9px;margin:5px 0 0!important}
+ .studio-up-next{padding:12px}
+ .studio-upcoming-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .studio-aside{grid-template-columns:1fr}
+ .studio-aside .studio-nutrition{grid-column:auto}
+ .studio-nutrition>img{height:150px}
+ .studio-footer-goal{padding:15px}
+ .studio-footer-goal h3{font-size:17px}
+ .studio-footer-summary{width:100%}
+ .studio-footer-goal .btn{margin-left:auto}
+}
+@media(prefers-reduced-motion:reduce){.studio-routine-step,.studio-upcoming-tile{transition:none}}
+
+/* Mockup fidelity: athletic logo, inline training cues */
+.sidebar .studio-brand{margin-bottom:43px;gap:11px}
+.sidebar .studio-brand .brand-mark{background:none;box-shadow:none;border-radius:0;width:42px;height:48px}
+.sidebar .studio-brand .brand-mark .ui-icon{height:47px;width:47px;color:#87fa62;stroke-width:2.1;filter:drop-shadow(0 0 12px #71ff6d65)}
+.sidebar .studio-brand strong{font-size:19px;letter-spacing:-.035em}
+.studio-brand-pro{background:#8cf65e;color:#0d2222;border-radius:99px;padding:2px 7px;font-size:10px;font-weight:900;font-family:Outfit;font-style:normal;vertical-align:middle}
+.sidebar .nav-link.active{background:linear-gradient(90deg,#7ef456,#a2fb5a);border-color:#a7ff8c;color:#0a211a;box-shadow:0 4px 25px #6bee5475}
+.sidebar .nav-link.active .ui-icon{color:#112d1c;stroke-width:2.3}
+.studio-demonstration .studio-technique{position:absolute;right:9px;top:84px;width:120px;z-index:3;border-radius:12px;padding:10px 11px;background:#17233cbd;border:1px solid #819c9a65;backdrop-filter:blur(8px);box-shadow:0 8px 26px #0005}
+.studio-technique[hidden]{display:none!important}
+.studio-technique strong{font-size:10px;color:#c3ff97}
+.studio-technique p{font-size:9px;line-height:1.55;color:#e0e8e9;margin:6px 0 0;max-height:120px;overflow:hidden}
+@media(max-width:1440px){.studio-technique{display:none}}
+@media(max-width:800px){.studio-demonstration .studio-technique{display:none}}
+
+.studio-user-row{display:flex;align-items:center;gap:10px;margin:0 8px 24px;padding:12px 5px;border-bottom:1px solid #ffffff1b}
+.studio-user-avatar{height:40px;width:40px;display:grid;place-items:center;border-radius:50%;color:#162b1e;font-size:18px;font-weight:900;background:linear-gradient(135deg,#8af4ab,#b9ef77);box-shadow:0 0 0 3px #ffffff15;flex:0 0 40px}
+.studio-user-row strong{font-family:Outfit;font-size:15px;color:#fff;display:block}
+.studio-user-row small{font-size:11px;color:#a2c4ab;display:block;margin-top:3px}
+.sidebar .studio-brand{margin-bottom:24px}

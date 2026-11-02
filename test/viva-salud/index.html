@@ -11,22 +11,23 @@
  <link rel="preconnect" href="https://fonts.googleapis.com">
  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="./assets/styles.css?v=4">
- <link rel="stylesheet" href="./assets/pro.css?v=4">
- <script src="./assets/sprite-coach.js?v=4" defer></script>
- <script src="./assets/app.js?v=4" defer></script>
+ <link rel="stylesheet" href="./assets/styles.css?v=5">
+ <link rel="stylesheet" href="./assets/pro.css?v=5"><link rel="stylesheet" href="./assets/studio.css?v=5">
+ <script src="./assets/sprite-coach.js?v=5" defer></script>
+ <script src="./assets/app.js?v=5" defer></script>
 </head>
 <body>
  <div id="app" class="app-shell is-hidden">
   <aside class="sidebar">
-   <div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>Viva la Salud</strong><small>FITNESS · NUTRICIÓN · BIENESTAR</small></div></div>
+   <div class="brand studio-brand"><div class="brand-mark"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#runner"></use></svg></div><div><strong>Viva la Salud <i class="studio-brand-pro">PRO</i></strong><small>FITNESS · NUTRICIÓN · BIENESTAR</small></div></div>
+   <div class="studio-user-row"><div class="studio-user-avatar" id="sidebar-user-avatar">R</div><div><strong>Hola, <span id="sidebar-user-name">¡bienvenido!</span></strong><small id="sidebar-user-detail">Tu plan personal</small></div></div>
    <div class="sidebar-label">TU ESPACIO PERSONAL</div>
    <nav class="nav-list" aria-label="Navegación principal">
-    <button class="nav-link active" data-tab="inicio"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#home"></use></svg> Mi día</button>
-    <button class="nav-link" data-tab="entrenar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#dumbbell"></use></svg> Entrenar</button>
-    <button class="nav-link" data-tab="comer"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#utensils"></use></svg> Alimentación</button>
-    <button class="nav-link" data-tab="progreso"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#chart"></use></svg> Mi evolución</button>
-    <button class="nav-link" data-tab="perfil"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#target"></use></svg> Mi plan</button>
+    <button class="nav-link active" data-tab="inicio"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#home"></use></svg> Inicio</button>
+    <button class="nav-link" data-tab="entrenar"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#dumbbell"></use></svg> Entrenamiento</button>
+    <button class="nav-link" data-tab="comer"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#utensils"></use></svg> Comidas y Recetas</button>
+    <button class="nav-link" data-tab="progreso"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#chart"></use></svg> Mi Progreso</button>
+    <button class="nav-link" data-tab="perfil"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#target"></use></svg> Planes</button>
    </nav>
    <div class="sidebar-highlight"><img src="./assets/media/runner.webp" loading="lazy" alt=""><div><strong>Tu mejor versión,<br><em>paso a paso.</em></strong><small>Cada día suma algo nuevo.</small></div></div><div class="sidebar-bottom"><span class="green-dot"></span> <span id="sidebar-status">Seguimos avanzando</span><div class="small-muted">Tu progreso es personal.</div></div>
   </aside>
@@ -65,13 +66,58 @@
      <div class="habits-grid"><div class="habit-card"><div class="habit-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#water"></use></svg></div><strong>Agua</strong><p>Registra los vasos que tomas.</p><div class="habit-controls"><button id="water-minus" aria-label="Restar vaso">−</button><strong id="water-count">0</strong><button id="water-plus" aria-label="Sumar vaso">+</button></div></div><div class="habit-card"><div class="habit-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#moon"></use></svg></div><strong>Descanso</strong><p>¿Cuántas horas dormiste?</p><div class="habit-controls"><input id="sleep-hours" aria-label="Horas de sueño" type="number" min="0" max="24" step=".5" placeholder="Horas"><button id="sleep-save">Guardar</button></div></div><div class="habit-card"><div class="habit-icon"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#sparkles"></use></svg></div><strong>Constancia</strong><p id="habit-constancy">Cada sesión cuenta, incluso las cortas.</p><button class="subtle-link" data-tab="progreso">Ver historial →</button></div></div>
     </section>
 
-    <section class="view" id="view-entrenar">
-     <div class="page-heading training-heading"><span class="eyebrow dark">ENTRENADOR INTELIGENTE</span><h1>Muévete a tu ritmo.</h1><p>Ejercicios guiados, descansos, voz y dificultad adaptativa. Sin compararte con nadie.</p></div>
-     <div class="training-layout">
-      <article class="feature-training"><div class="workout-photo" aria-hidden="true"></div><span class="tag tag-lime">PLAN PERSONALIZADO</span><div class="training-circle">✳</div><h2 id="train-type">Fuerza funcional</h2><p>Te acompañamos paso a paso, con un ritmo diseñado para progresar.</p><div class="train-facts"><span><strong id="train-minutes">20</strong> min aprox.</span><span><strong id="train-rounds">2</strong> rondas</span><span><strong id="train-exercises">5</strong> ejercicios</span></div><button class="btn btn-lime wide" id="open-coach">▶ Iniciar entrenamiento guiado</button><p class="subtle-safety">Sin aguantar la respiración. Detente ante dolor o síntomas nuevos.</p></article>
-      <div class="exercise-list panel"><div class="panel-top"><h3>Ejercicios del día</h3><span class="tag tag-light" id="train-level">INICIAL</span></div><div id="exercise-items"></div><p class="muted-note">Calentamiento 3 minutos · Vuelta a la calma 2 minutos. Si tienes dolor, reduce o evita el movimiento.</p></div>
+    <section class="view training-dashboard" id="view-entrenar">
+     <div class="studio-heading">
+      <div class="studio-title">
+       <div class="studio-kicker"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#dumbbell"></use></svg><span>ENTRENAMIENTO GUIADO</span></div>
+       <h1>Entrenamiento guiado</h1>
+       <p>Tu rutina de <strong id="train-type">Fuerza funcional</strong> · <span id="train-minutes">20</span> minutos estimados · <span class="studio-level" id="train-level">PRINCIPIANTE</span></p>
+      </div>
+      <button type="button" class="studio-goal-pill" id="train-goal-open"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#target"></use></svg><span><small>OBJETIVO DE TU PLAN</small><strong id="studio-goal">Bienestar y energía</strong></span><span aria-hidden="true">›</span></button>
      </div>
-     <div class="info-strip">🧠 <span>Tras cada sesión valoras el esfuerzo del 1 al 10. El siguiente circuito ajusta el tiempo de trabajo. Si estás retomando el ejercicio o tienes una condición médica, consulta la intensidad apropiada con tu profesional de salud.</span></div>
+     <div class="studio-grid">
+      <aside class="studio-routine" aria-label="Rutina de hoy">
+       <div class="studio-card-title"><h2>Rutina de hoy</h2><span><b id="studio-ex-count">5</b> ejercicios</span></div>
+       <p class="studio-routine-note"><span id="train-rounds">2</span> rondas · Sigue cada movimiento</p>
+       <div id="exercise-items" class="studio-exercise-list"></div>
+       <button type="button" class="studio-restart" id="open-coach"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#activity"></use></svg> Reiniciar rutina</button>
+      </aside>
+      <div class="studio-main">
+       <div id="coach-stage" class="studio-coach-stage" aria-label="Entrenamiento guiado">
+        <div class="studio-stage-placeholder">Tu entrenador está preparando la rutina...</div>
+       </div>
+       <section class="studio-up-next">
+        <div class="studio-up-header"><h3>Próximos movimientos</h3><span>SEGÚN TU PLAN</span></div>
+        <div id="studio-upcoming" class="studio-upcoming-list"></div>
+       </section>
+      </div>
+      <aside class="studio-aside" aria-label="Tu progreso y alimentación">
+       <article class="studio-side-card studio-progress">
+        <div class="studio-side-head"><h3>Mi progreso</h3><button type="button" class="studio-text-link" data-tab="progreso">Ver más ›</button></div>
+        <div class="studio-weight-line"><span><small>PESO REGISTRADO</small><strong id="studio-weight">—</strong></span><span><small>MI META</small><strong id="studio-target">—</strong></span></div>
+        <div class="studio-side-chart" id="studio-weight-chart"><p>Agrega dos mediciones para ver tu evolución.</p></div>
+        <div class="studio-progress-foot" id="studio-weight-foot">El progreso no se reduce a un número.</div>
+       </article>
+       <article class="studio-side-card studio-plan">
+        <div class="studio-side-head"><h3>Mi plan</h3><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#target"></use></svg></div>
+        <div class="studio-plan-line"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#target"></use></svg><span id="studio-plan-goal">Bienestar</span></div>
+        <div class="studio-plan-line"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#calendar"></use></svg><span><b id="studio-days">3</b> días por semana</span></div>
+        <div class="studio-plan-line"><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#check"></use></svg><span><b id="studio-done">0</b> sesiones esta semana</span></div>
+       </article>
+       <article class="studio-side-card studio-nutrition">
+        <div class="studio-side-head"><h3>Tu comida de hoy</h3><button type="button" class="studio-text-link" data-tab="comer">Ver recetas ›</button></div>
+        <img src="./assets/media/food.webp" alt="Plato con verduras y alimentos frescos" loading="lazy">
+        <p id="studio-food-name">Elige una receta para recuperar energía.</p>
+        <div class="studio-hydration"><div class="studio-hydration-head"><span><svg class="ui-icon" aria-hidden="true"><use href="./assets/icons.svg#water"></use></svg> Hidratación</span><strong id="studio-water">0 vasos</strong></div><div class="studio-water-dots" id="studio-water-dots"></div><button type="button" class="studio-text-link" id="studio-water-add">+ Registrar un vaso</button></div>
+       </article>
+      </aside>
+     </div>
+     <section class="studio-footer-goal">
+      <span class="studio-footer-symbol">✦</span><div><h3>Tu objetivo se construye en cada sesión</h3><p>Más fuerza · Movimiento consciente · Salud sostenible</p></div>
+      <div class="studio-footer-summary"><strong id="studio-total-sessions">0</strong><span>sesiones completadas</span></div>
+      <button type="button" class="btn btn-lime" data-tab="progreso">Ver mi evolución →</button>
+     </section>
+     <p class="studio-safety">Las demostraciones son ilustrativas, no una evaluación de técnica. Respira normalmente y detente si aparece dolor, mareo o falta de aire inusual.</p>
     </section>
 
     <section class="view" id="view-comer">
@@ -108,9 +154,9 @@
   <div class="auth-form-wrap"><div class="auth-box"><span class="eyebrow dark">BIENVENIDO A TU NUEVO COMIENZO</span><h2 id="auth-title">Qué bueno verte.</h2><p>Accede a tu espacio personal y continúa donde quedaste.</p><div class="auth-switch"><button id="switch-login" class="selected" type="button">Ingresar</button><button id="switch-register" type="button">Crear cuenta</button></div>
    <form id="auth-form" class="form-stack"><label class="register-only" hidden>Tu nombre<input id="auth-name" autocomplete="name" placeholder="Cómo quieres que te llamemos"></label><label>Correo electrónico<input id="auth-email" type="email" autocomplete="email" placeholder="tu@correo.cl" required></label><label>Contraseña<input id="auth-password" type="password" autocomplete="current-password" minlength="12" placeholder="Mínimo 12 caracteres" required></label><button class="btn btn-dark wide" id="auth-submit" type="submit">Entrar a mi espacio →</button><small class="login-hint">Tus datos se guardan en tu cuenta. No compartimos tu despensa ni tu historial.</small></form></div></div>
  </div>
- <div class="coach-overlay" id="coach-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="coach-title">
-  <div class="coach-modal"><div class="coach-header"><div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>VIVA</strong><small>ENTRENANDO</small></div></div><button class="close-coach" id="coach-exit" aria-label="Cerrar entrenamiento">✕</button></div>
-   <div class="coach-body" id="coach-body"><span class="eyebrow" id="coach-phase">PREPARACIÓN</span><div class="coach-progress-track"><div id="coach-progress-fill"></div></div><div class="coach-demonstration"><canvas id="coach-sprite" width="480" height="300" class="coach-sprite" role="img" aria-label="Animación de seis posiciones del ejercicio" hidden></canvas><div class="coach-rest-visual" id="coach-rest-visual" role="img" aria-label="Respira pausadamente durante el descanso" hidden><div class="breath-orb"><span>Inhala<br>y exhala</span></div></div><video id="coach-demo" muted loop playsinline preload="metadata" poster="./assets/media/training.webp" aria-label="Ilustración animada del movimiento" hidden></video><div class="demo-overlay"><span class="video-tag">✦ DEMOSTRACIÓN VISUAL</span><div class="coach-exercise-icon" id="coach-icon">✳</div></div></div><h2 id="coach-title">A tu ritmo.</h2><p id="coach-tip">Respira con calma.</p><div id="coach-timer" class="coach-clock">00:30</div><div id="coach-position" class="coach-position">Ejercicio 1 / 5</div><div class="coach-next-list" id="coach-next-list"></div><div class="coach-visual-note">Las animaciones son ilustrativas. Sigue las indicaciones y no fuerces movimientos con dolor.</div><div class="coach-actions"><button class="btn btn-outline-light" id="coach-prev">↶ Anterior</button><button class="btn btn-lime" id="coach-play">▶ Iniciar</button><button class="btn btn-outline-light" id="coach-next">Siguiente →</button></div><div class="voice-toggle"><label><input type="checkbox" id="coach-voice" checked> Guía por voz</label></div></div>
+ <div class="coach-overlay" id="coach-overlay" hidden role="region" aria-label="Entrenador guiado">
+  <div class="coach-modal"><div class="coach-header studio-coach-top"><div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>VIVA</strong><small>ENTRENANDO</small></div></div><button class="close-coach" id="coach-exit" aria-label="Salir del entrenamiento">Salir ✕</button></div>
+   <div class="coach-body" id="coach-body"><span class="eyebrow" id="coach-phase">PREPARACIÓN</span><div class="coach-progress-track"><div id="coach-progress-fill"></div></div><div class="coach-demonstration studio-demonstration"><div class="studio-technique" id="studio-technique"><strong>✓ Técnica clave</strong><p id="studio-technique-text">Controla el movimiento a un ritmo cómodo.</p></div><canvas id="coach-sprite" width="480" height="300" class="coach-sprite" role="img" aria-label="Animación de seis posiciones del ejercicio" hidden></canvas><div class="coach-rest-visual" id="coach-rest-visual" role="img" aria-label="Respira pausadamente durante el descanso" hidden><div class="breath-orb"><span>Inhala<br>y exhala</span></div></div><video id="coach-demo" muted loop playsinline preload="metadata" poster="./assets/media/training.webp" aria-label="Ilustración animada del movimiento" hidden></video><div class="demo-overlay"><span class="video-tag">✦ DEMOSTRACIÓN VISUAL</span><div class="coach-exercise-icon" id="coach-icon">✳</div></div></div><h2 id="coach-title">A tu ritmo.</h2><p id="coach-tip">Respira con calma.</p><div class="studio-controls-bottom"><div class="studio-clock-circle"><div id="coach-timer" class="coach-clock">00:30</div><span>TIEMPO RESTANTE</span></div><div class="studio-motion-details"><div id="coach-position" class="coach-position">Paso 1 de 5</div><div class="coach-actions"><button class="btn btn-outline-light" id="coach-prev">‹ Anterior</button><button class="btn btn-lime" id="coach-play">▶ Iniciar</button><button class="btn btn-outline-light" id="coach-next">Siguiente ›</button></div><div class="voice-toggle"><label><input type="checkbox" id="coach-voice" checked> Guía por voz</label></div></div></div><div class="coach-next-list" id="coach-next-list"></div><div class="coach-visual-note">Haz los movimientos con control, dentro de tus posibilidades.</div></div>
    <div class="coach-complete" id="coach-complete" hidden><span class="trophy">🏆</span><h2>¡Sesión terminada!</h2><p>Completar es ganar. Cuéntanos cómo se sintió para adaptar la próxima.</p><label for="coach-rpe">Esfuerzo percibido: <strong id="coach-rpe-label">6</strong> / 10</label><input id="coach-rpe" type="range" min="1" max="10" value="6"><div class="coach-finish-buttons"><button class="btn btn-lime" id="coach-save">Guardar sesión</button><button class="btn btn-outline-light" id="coach-discard">Salir sin guardar</button></div></div>
   </div>
  </div>

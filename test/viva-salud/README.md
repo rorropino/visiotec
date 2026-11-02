@@ -2,6 +2,13 @@
 
 Aplicación web responsiva / PWA en **PHP 8.3+, SQLite, JavaScript y CSS**, aislada de otros sistemas. Se entrega como una **versión funcional de pruebas**, no una aplicación clínica certificada.
 
+## Pantalla de entrenamiento (diseño de referencia)
+- Dashboard de tres columnas como la referencia visual: rutina interactiva a la izquierda; entrenador grande, animación, temporizador y controles al centro; progreso real, plan y alimentación a la derecha.
+- Sin ventana modal: el entrenador se integra en la pantalla, conserva los controles y permite seleccionar ejercicios directamente desde el listado.
+- El panel lateral usa únicamente medidas, sesiones, comidas y agua que cada usuario guardó. No se muestran niveles ni calorías inventados.
+- Diseño responsive: el personaje y los controles tienen prioridad en móvil; la rutina y estadísticas pasan debajo.
+- Validación automatizada de estructura de tres columnas y entrenador en línea, además de API y navegación móvil.
+
 ## Entrenamiento guiado con sprites IA
 - Atlas WebP de **cinco movimientos y seis posiciones por movimiento**, creado a partir de secuencias de imágenes del proyecto: marcha, sentadilla a silla, flexión contra pared, puente de glúteos y bird dog.
 - Un animador Canvas local, sin dependencia externa, presenta la secuencia en bucle y cambia de ejercicio al pulsar Siguiente o al terminar el temporizador.
