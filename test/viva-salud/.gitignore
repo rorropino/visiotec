@@ -1,0 +1,6 @@
+private/*.sqlite
+private/*.sqlite-*
+private/*.db
+.env
+*.log
+.DS_Store

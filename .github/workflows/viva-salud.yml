@@ -1,0 +1,75 @@
+name: Viva la Salud - pruebas y despliegue test
+
+on:
+  push:
+    branches: [test/viva-salud]
+    paths:
+      - 'test/viva-salud/**'
+      - '.github/workflows/viva-salud.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint + integración API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, sqlite3, openssl
+      - name: Validar PHP y JS
+        run: |
+          php -l test/viva-salud/api/bootstrap.php
+          php -l test/viva-salud/api/engine.php
+          php -l test/viva-salud/api/index.php
+          node --check test/viva-salud/assets/app.js
+          node --check test/viva-salud/sw.js
+      - name: Verificar API aislada
+        run: |
+          php -S 127.0.0.1:18887 -t test >/tmp/viva-php.log 2>&1 &
+          for i in 1 2 3 4 5 6 7 8 9 10; do curl -sf 'http://127.0.0.1:18887/viva-salud/api/index.php?action=session' && break || sleep 1; done
+          python3 test/viva-salud/tests/smoke.py
+
+  deploy:
+    name: Publicar SOLO en test.visiotec.cl/viva-salud/
+    needs: test
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar configuración SFTP/SSH
+        env:
+          SSH_HOST: ${{ secrets.VIVA_SSH_HOST }}
+          SSH_USER: ${{ secrets.VIVA_SSH_USER }}
+          SSH_KEY: ${{ secrets.VIVA_SSH_PRIVATE_KEY }}
+          SSH_KNOWN: ${{ secrets.VIVA_SSH_KNOWN_HOSTS }}
+          REMOTE_DIR: ${{ secrets.VIVA_DEPLOY_PATH }}
+        run: |
+          test -n "$SSH_HOST" && test -n "$SSH_USER" && test -n "$SSH_KEY" && test -n "$SSH_KNOWN" && test -n "$REMOTE_DIR"
+          case "$REMOTE_DIR" in
+            */viva-salud|*/viva-salud/) ;;
+            *) echo "La ruta destino debe terminar en /viva-salud"; exit 1 ;;
+          esac
+      - name: Configurar SSH verificado
+        env:
+          SSH_KEY: ${{ secrets.VIVA_SSH_PRIVATE_KEY }}
+          SSH_KNOWN: ${{ secrets.VIVA_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 0700 -d "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 0600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$SSH_KNOWN" > "$HOME/.ssh/known_hosts"
+          chmod 0600 "$HOME/.ssh/known_hosts"
+      - name: Desplegar subcarpeta sin modificar SGSE
+        env:
+          SSH_HOST: ${{ secrets.VIVA_SSH_HOST }}
+          SSH_USER: ${{ secrets.VIVA_SSH_USER }}
+          REMOTE_DIR: ${{ secrets.VIVA_DEPLOY_PATH }}
+        run: |
+          rsync -avz --no-perms --no-owner --no-group \
+            --exclude 'private/' --exclude 'tests/' --exclude '.env' --exclude '*.sqlite*' --exclude 'README.md' \
+            -e "ssh -o StrictHostKeyChecking=yes" test/viva-salud/ "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"

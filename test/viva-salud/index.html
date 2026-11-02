@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+ <meta name="theme-color" content="#111915">
+ <meta name="description" content="Viva la Salud: tu entrenador y asistente de alimentación, paso a paso.">
+ <title>Viva la Salud · Tu mejor versión</title>
+ <link rel="manifest" href="./manifest.webmanifest">
+ <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+ <link rel="stylesheet" href="./assets/styles.css?v=1">
+ <script src="./assets/app.js?v=1" defer></script>
+</head>
+<body>
+ <div id="app" class="app-shell is-hidden">
+  <aside class="sidebar">
+   <div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>VIVA</strong><small>LA SALUD</small></div></div>
+   <div class="sidebar-label">TU ESPACIO</div>
+   <nav class="nav-list" aria-label="Navegación principal">
+    <button class="nav-link active" data-tab="inicio"><span>◫</span> Mi día</button>
+    <button class="nav-link" data-tab="entrenar"><span>◎</span> Entrenar</button>
+    <button class="nav-link" data-tab="comer"><span>◈</span> Alimentación</button>
+    <button class="nav-link" data-tab="progreso"><span>↗</span> Mi evolución</button>
+    <button class="nav-link" data-tab="perfil"><span>☷</span> Mi plan</button>
+   </nav>
+   <div class="sidebar-bottom"><span class="green-dot"></span> Un día a la vez<div class="small-muted">La constancia gana.</div></div>
+  </aside>
+  <main class="main">
+   <header class="topbar">
+    <div class="breadcrumb">TU CAMINO <span>/</span> <span id="current-tab-title">MI DÍA</span></div>
+    <div class="top-actions"><span id="today-caption"></span><button class="avatar" id="go-profile" title="Mi perfil" aria-label="Mi perfil">R</button></div>
+   </header>
+   <div class="content">
+    <section class="view active" id="view-inicio">
+     <div class="hero">
+      <div class="hero-content"><span class="eyebrow"><span class="pulse-dot"></span> TU MEJOR VERSIÓN EMPIEZA HOY</span>
+       <h1>¡Vamos con todo,<br><em id="welcome-name">campeón</em>!</h1>
+       <p>No necesitas hacerlo perfecto. Necesitas seguir avanzando, un paso a la vez.</p>
+       <div class="hero-actions"><button class="btn btn-lime" id="hero-start">▶ Comenzar entrenamiento</button><button class="btn btn-ghost" id="hero-food">Ver mi alimentación ↗</button></div>
+      </div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="core-circle"><span>HOY<br><strong>+</strong></span></div><span class="art-star star-a">✳</span><span class="art-star star-b">✴</span></div>
+     </div>
+     <div class="section-heading"><div><span class="eyebrow dark">TU PANORAMA</span><h2>Así vas hoy</h2></div><button class="subtle-link" data-tab="progreso">Ver evolución →</button></div>
+     <div class="stat-grid">
+      <div class="stat-card"><span class="stat-icon">⚖</span><span class="stat-label">PESO ACTUAL</span><div><strong id="stat-weight">—</strong><span class="stat-unit">kg</span></div><small id="stat-weight-note">Registra tu punto de partida</small></div>
+      <div class="stat-card"><span class="stat-icon">🏃</span><span class="stat-label">ENTRENAMIENTOS</span><div><strong id="stat-workouts">0</strong><span class="stat-unit">esta semana</span></div><small id="stat-workouts-note">Tu ritmo, tu camino</small></div>
+      <div class="stat-card"><span class="stat-icon">◎</span><span class="stat-label">OBJETIVO</span><div><strong class="goal-name" id="stat-goal">Bienestar</strong></div><small id="stat-goal-note">Tu plan personalizado</small></div>
+      <div class="stat-card"><span class="stat-icon">◷</span><span class="stat-label">TIEMPO PARA TI</span><div><strong id="stat-minutes">20</strong><span class="stat-unit">min / sesión</span></div><small>Un rato que suma</small></div>
+     </div>
+     <div class="two-grid">
+      <article class="panel today-plan"><div class="panel-top"><span class="tag tag-dark">MOVIMIENTO</span><span class="mini-status">RECOMENDADO</span></div><h3>Tu entrenamiento de hoy</h3><p id="today-workout-copy">Un circuito pensado para tu condición actual.</p><div class="workout-meta"><span>◷ <b id="today-workout-time">20</b> min</span><span>◎ <b id="today-workout-rounds">2</b> rondas</span></div><button class="btn btn-dark" id="today-workout-open">Empezar rutina ↗</button></article>
+      <article class="panel food-panel"><div class="panel-top"><span class="tag tag-green">ALIMENTACIÓN</span><span>🥑</span></div><h3>¿Qué cocinamos hoy?</h3><p>La mejor comida puede partir con lo que ya tienes en casa.</p><div id="today-food-suggestion" class="food-suggestion">Agrega tus ingredientes y te propondré recetas.</div><button class="btn btn-outline" id="today-food-open">Abrir mi cocina ↗</button></article>
+     </div>
+     <div class="section-heading"><div><span class="eyebrow dark">PEQUEÑAS VICTORIAS</span><h2>Hábitos que suman</h2></div></div>
+     <div class="habits-grid"><div class="habit-card"><div class="habit-icon">💧</div><strong>Agua</strong><p>Registra los vasos que tomas.</p><div class="habit-controls"><button id="water-minus" aria-label="Restar vaso">−</button><strong id="water-count">0</strong><button id="water-plus" aria-label="Sumar vaso">+</button></div></div><div class="habit-card"><div class="habit-icon">🌙</div><strong>Descanso</strong><p>¿Cuántas horas dormiste?</p><div class="habit-controls"><input id="sleep-hours" aria-label="Horas de sueño" type="number" min="0" max="24" step=".5" placeholder="Horas"><button id="sleep-save">Guardar</button></div></div><div class="habit-card"><div class="habit-icon">🌱</div><strong>Constancia</strong><p id="habit-constancy">Cada sesión cuenta, incluso las cortas.</p><button class="subtle-link" data-tab="progreso">Ver historial →</button></div></div>
+    </section>
+
+    <section class="view" id="view-entrenar">
+     <div class="page-heading"><span class="eyebrow dark">ENTRENADOR INTELIGENTE</span><h1>Muévete a tu ritmo.</h1><p>Ejercicios guiados, descansos, voz y dificultad adaptativa. Sin compararte con nadie.</p></div>
+     <div class="training-layout">
+      <article class="feature-training"><span class="tag tag-lime">TU RUTINA</span><div class="training-circle">✳</div><h2 id="train-type">Fuerza funcional</h2><p>Te acompañamos paso a paso, con un ritmo diseñado para progresar.</p><div class="train-facts"><span><strong id="train-minutes">20</strong> min aprox.</span><span><strong id="train-rounds">2</strong> rondas</span><span><strong id="train-exercises">5</strong> ejercicios</span></div><button class="btn btn-lime wide" id="open-coach">▶ Iniciar entrenamiento guiado</button><p class="subtle-safety">Sin aguantar la respiración. Detente ante dolor o síntomas nuevos.</p></article>
+      <div class="exercise-list panel"><div class="panel-top"><h3>Ejercicios del día</h3><span class="tag tag-light" id="train-level">INICIAL</span></div><div id="exercise-items"></div><p class="muted-note">Calentamiento 3 minutos · Vuelta a la calma 2 minutos. Si tienes dolor, reduce o evita el movimiento.</p></div>
+     </div>
+     <div class="info-strip">🧠 <span>Tras cada sesión valoras el esfuerzo del 1 al 10. El siguiente circuito ajusta el tiempo de trabajo. Si estás retomando el ejercicio o tienes una condición médica, consulta la intensidad apropiada con tu profesional de salud.</span></div>
+    </section>
+
+    <section class="view" id="view-comer">
+     <div class="page-heading"><span class="eyebrow dark">COCINA QUE TE CUIDA</span><h1>Come rico. Come mejor.</h1><p>Ideas reales con tus ingredientes, sin recetas imposibles ni dietas extremas.</p></div>
+     <div class="kitchen-grid"><article class="panel pantry-panel"><div class="panel-top"><h3>🧺 Mi despensa</h3><span class="tag tag-light" id="pantry-count">0 ingredientes</span></div><p>¿Qué tienes en casa? Agrégalo una sola vez y úsalo para crear recetas.</p><form id="pantry-form" class="pantry-form"><label for="pantry-ingredient" class="sr-only">Ingrediente</label><input id="pantry-ingredient" maxlength="80" placeholder="Ej. huevo, arroz, tomate" required><button type="submit" class="btn btn-dark">Agregar</button></form><div id="pantry-tags" class="pantry-tags"></div></article>
+      <article class="panel kitchen-ai"><div class="panel-top"><span class="tag tag-dark">TU ASISTENTE CULINARIO</span><span>✦</span></div><h3>¿Qué te gustaría comer?</h3><p id="food-advice">Alimentación flexible y sostenible.</p><label for="ai-request">Dame una idea para...</label><textarea id="ai-request" rows="2" maxlength="280" placeholder="Ej. cena liviana, rica en proteína, con lo que tengo"></textarea><button id="ai-generate" class="btn btn-lime wide">✦ Crear receta con IA</button><div class="ai-status" id="ai-status">Para IA generativa se requiere configurar el proveedor en el servidor. Mientras tanto puedes usar las recetas inteligentes de abajo.</div><div id="ai-answer" class="ai-answer" hidden></div></article></div>
+     <div class="panel nutrition-panel"><div class="panel-top"><div><span class="eyebrow dark">SEGÚN TU OBJETIVO Y ESFUERZO</span><h3>Tu plato inteligente</h3></div><span>✳</span></div><p id="nutrition-intro">Una guía flexible y sin contar cada caloría.</p><div class="nutrition-grid" id="nutrition-insights"></div><p class="muted-note" id="nutrition-recovery"></p><p class="muted-note" id="nutrition-caution"></p></div>
+     <div class="section-heading"><div><span class="eyebrow dark">SUGERENCIAS A TU MEDIDA</span><h2>Con lo que ya tienes</h2></div><span class="small-muted">Primero las que necesitan menos compras</span></div>
+     <div class="recipe-grid" id="recipe-grid"></div>
+     <article class="panel journal-panel"><div><span class="eyebrow dark">SEGUIMIENTO SIN CULPA</span><h3>Mi diario de comidas</h3><p>Registra lo importante. No hace falta pesar cada bocado.</p></div><form id="meal-form" class="journal-form"><select id="meal-type" aria-label="Tipo de comida"><option value="desayuno">Desayuno</option><option value="almuerzo">Almuerzo</option><option value="once">Once</option><option value="cena">Cena</option><option value="colacion">Colación</option></select><input id="meal-text" maxlength="400" required placeholder="Ej. pollo, arroz y ensalada"><button class="btn btn-dark" type="submit">Registrar</button></form></article>
+     <div id="meal-list" class="meal-list"></div>
+    </section>
+
+    <section class="view" id="view-progreso">
+     <div class="page-heading"><span class="eyebrow dark">CADA PASO CUENTA</span><h1>Tu evolución real.</h1><p>El peso es solo una parte. También importan la fuerza, la cintura y cómo te sientes.</p></div>
+     <div class="progress-grid"><article class="panel chart-panel"><div class="panel-top"><h3>⚖ Evolución de peso</h3><span class="tag tag-light">HISTÓRICO</span></div><div class="chart-area" id="weight-chart"><div class="empty-chart">Agrega tu primera medición para ver tu evolución.</div></div><div class="chart-key">● Peso registrado (kg)</div></article><article class="panel measurement-panel"><h3>Registrar mi progreso</h3><p>Idealmente pésate en condiciones similares. Los cambios diarios son normales.</p><form id="measurement-form" class="form-stack"><label>Fecha<input id="measure-date" type="date" required></label><label>Peso actual (kg)<input id="measure-weight" type="number" min="35" max="300" step=".1" placeholder="Ej. 88.7" required></label><label>Cintura (cm) · opcional<input id="measure-waist" type="number" min="40" max="200" step=".5" placeholder="Ej. 95"></label><button class="btn btn-dark wide" type="submit">Guardar medición</button></form></article></div>
+     <div class="section-heading"><div><span class="eyebrow dark">LO QUE ESTÁS CONSTRUYENDO</span><h2>Sesiones completadas</h2></div></div><div id="workout-history" class="history-list"></div>
+    </section>
+
+    <section class="view" id="view-perfil">
+     <div class="page-heading"><span class="eyebrow dark">UN PLAN TAN ÚNICO COMO TÚ</span><h1>Conozcamos tu punto de partida.</h1><p>Estos datos te ayudan a ajustar los entrenamientos y las sugerencias. Puedes cambiarlos cuando quieras.</p></div>
+     <form id="profile-form" class="profile-form"><div class="panel form-panel"><span class="step-label">01 / SOBRE TI</span><h3>Tu punto de partida</h3><div class="form-grid"><label>¿Cómo te llamas?<input name="display_name" maxlength="80" required></label><label>Edad<input name="age" type="number" min="16" max="100" placeholder="Años"></label><label>Estatura (cm)<input name="height_cm" type="number" min="120" max="230" step=".1"></label><label>Peso actual (kg)<input name="weight_kg" type="number" min="35" max="300" step=".1"></label><label>Peso objetivo (kg) · opcional<input name="target_kg" type="number" min="35" max="300" step=".1"></label></div></div>
+      <div class="panel form-panel"><span class="step-label">02 / TU OBJETIVO</span><h3>¿Qué físico y bienestar buscas?</h3><div class="choice-grid" id="goal-choices"><label class="choice-card"><input type="radio" name="goal" value="bajar"><span>↘</span><strong>Bajar grasa</strong><small>Algunas tallas menos</small></label><label class="choice-card"><input type="radio" name="goal" value="definir"><span>✳</span><strong>Definir</strong><small>Músculos marcados</small></label><label class="choice-card"><input type="radio" name="goal" value="musculo"><span>💪</span><strong>Ganar músculo</strong><small>Más fuerza y volumen</small></label><label class="choice-card"><input type="radio" name="goal" value="mantener"><span>◎</span><strong>Mantener</strong><small>Conservar lo logrado</small></label><label class="choice-card"><input type="radio" name="goal" value="salud"><span>♥</span><strong>Vivir mejor</strong><small>Movilidad y bienestar</small></label></div></div>
+      <div class="panel form-panel"><span class="step-label">03 / TU NIVEL</span><h3>Partamos desde donde estás</h3><div class="form-grid"><label>Experiencia<select name="experience"><option value="principiante">Estoy comenzando o retomando</option><option value="intermedio">Entreno a veces</option><option value="avanzado">Entreno habitualmente</option></select></label><label>¿Cuántas flexiones seguidas?<select name="pushups"><option value="0">Ninguna</option><option value="1-10">1 a 10</option><option value="11-20">11 a 20</option><option value="20+">Más de 20</option></select></label><label>¿Cuántas sentadillas seguidas?<select name="squats"><option value="0">Ninguna</option><option value="1-10">1 a 10</option><option value="11-20">11 a 20</option><option value="21-40">21 a 40</option><option value="40+">Más de 40</option></select></label><label>Días para entrenar / semana<select name="weekly_days"><option value="2">2 días</option><option value="3">3 días</option><option value="4">4 días</option><option value="5">5 días</option><option value="6">6 días</option><option value="1">1 día</option></select></label><label>Minutos por sesión<select name="minutes"><option value="15">15 minutos</option><option value="20">20 minutos</option><option value="25">25 minutos</option><option value="30">30 minutos</option><option value="40">40 minutos</option></select></label><label>Equipo disponible<select name="equipment"><option value="ninguno">Solo mi cuerpo</option><option value="bandas">Bandas elásticas</option><option value="mancuernas">Mancuernas</option><option value="mixto">Mixto</option></select></label></div></div>
+      <div class="panel form-panel"><span class="step-label">04 / CUIDARTE BIEN</span><h3>Preferencias y precauciones</h3><p class="muted-note">Opcional y privado. Selecciona lo que corresponda; evita intensidad alta sin evaluación profesional si tienes problemas de salud.</p><div class="checks"><label><input type="checkbox" name="health_flags" value="presion_alta"> Presión arterial alta</label><label><input type="checkbox" name="health_flags" value="dolor_articular"> Molestias articulares</label><label><input type="checkbox" name="health_flags" value="retorno"> He pasado mucho tiempo sin ejercitar</label><label><input type="checkbox" name="health_flags" value="calculos_renales"> Antecedentes de cálculos renales</label><label><input type="checkbox" name="health_flags" value="colesterol_alto"> Colesterol elevado</label></div><div class="form-grid"><label>Alergias o intolerancias (separadas por coma)<input id="allergy-input" placeholder="Ej. gluten, lactosa, huevo"></label><label>Alimentos que prefieres evitar<input id="avoid-input" placeholder="Ej. azúcar añadida"></label></div><p class="muted-note">Esto no reemplaza una evaluación médica, especialmente si tienes síntomas o antecedentes de salud.</p></div>
+      <div class="profile-bottom"><button type="button" class="btn btn-outline" id="logout">Cerrar sesión</button><button type="button" class="btn btn-outline" id="export-data">Exportar mis datos</button><button type="submit" class="btn btn-lime">Guardar mi plan ✳</button></div><details class="account-danger"><summary>Eliminar cuenta y datos personales</summary><p>Se borrarán permanentemente tus mediciones, entrenamientos, comidas y perfil. Esta acción no se puede deshacer.</p><label>Confirma tu contraseña<input type="password" id="delete-password" autocomplete="current-password" placeholder="Tu contraseña actual"></label><button type="button" class="btn btn-danger" id="delete-account">Eliminar mi cuenta definitivamente</button></details></form>
+    </section>
+   </div>
+  </main>
+  <nav class="mobile-nav" aria-label="Navegación inferior"><button data-tab="inicio" class="active">⌂<span>Hoy</span></button><button data-tab="entrenar">◎<span>Entrenar</span></button><button data-tab="comer">◈<span>Comer</span></button><button data-tab="progreso">↗<span>Avances</span></button><button data-tab="perfil">☷<span>Perfil</span></button></nav>
+ </div>
+ <div class="auth-screen" id="auth-screen">
+  <div class="auth-illustration"><div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>VIVA</strong><small>LA SALUD</small></div></div><div class="auth-slogan"><span class="eyebrow"><span class="pulse-dot"></span> TU MEJOR ETAPA</span><h1>La mejor<br>versión de ti<br><em>no tiene fecha.</em></h1><p>Entrena, come mejor y disfruta cada logro. Diseñado para la vida real.</p><div class="big-flower">✳</div></div></div>
+  <div class="auth-form-wrap"><div class="auth-box"><span class="eyebrow dark">BIENVENIDO A TU NUEVO COMIENZO</span><h2 id="auth-title">Qué bueno verte.</h2><p>Accede a tu espacio personal y continúa donde quedaste.</p><div class="auth-switch"><button id="switch-login" class="selected" type="button">Ingresar</button><button id="switch-register" type="button">Crear cuenta</button></div>
+   <form id="auth-form" class="form-stack"><label class="register-only" hidden>Tu nombre<input id="auth-name" autocomplete="name" placeholder="Cómo quieres que te llamemos"></label><label>Correo electrónico<input id="auth-email" type="email" autocomplete="email" placeholder="tu@correo.cl" required></label><label>Contraseña<input id="auth-password" type="password" autocomplete="current-password" minlength="12" placeholder="Mínimo 12 caracteres" required></label><button class="btn btn-dark wide" id="auth-submit" type="submit">Entrar a mi espacio →</button><small class="login-hint">Tus datos se guardan en tu cuenta. No compartimos tu despensa ni tu historial.</small></form></div></div>
+ </div>
+ <div class="coach-overlay" id="coach-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="coach-title">
+  <div class="coach-modal"><div class="coach-header"><div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>VIVA</strong><small>ENTRENANDO</small></div></div><button class="close-coach" id="coach-exit" aria-label="Cerrar entrenamiento">✕</button></div>
+   <div class="coach-body" id="coach-body"><span class="eyebrow" id="coach-phase">PREPARACIÓN</span><div class="coach-progress-track"><div id="coach-progress-fill"></div></div><div class="coach-exercise-icon" id="coach-icon">✳</div><h2 id="coach-title">A tu ritmo.</h2><p id="coach-tip">Respira con calma.</p><div id="coach-timer" class="coach-clock">00:30</div><div id="coach-position" class="coach-position">Ejercicio 1 / 5</div><div class="coach-actions"><button class="btn btn-outline-light" id="coach-prev">↶ Anterior</button><button class="btn btn-lime" id="coach-play">▶ Iniciar</button><button class="btn btn-outline-light" id="coach-next">Siguiente →</button></div><div class="voice-toggle"><label><input type="checkbox" id="coach-voice" checked> Guía por voz</label></div></div>
+   <div class="coach-complete" id="coach-complete" hidden><span class="trophy">🏆</span><h2>¡Sesión terminada!</h2><p>Completar es ganar. Cuéntanos cómo se sintió para adaptar la próxima.</p><label for="coach-rpe">Esfuerzo percibido: <strong id="coach-rpe-label">6</strong> / 10</label><input id="coach-rpe" type="range" min="1" max="10" value="6"><div class="coach-finish-buttons"><button class="btn btn-lime" id="coach-save">Guardar sesión</button><button class="btn btn-outline-light" id="coach-discard">Salir sin guardar</button></div></div>
+  </div>
+ </div>
+ <div class="recipe-modal" id="recipe-modal" hidden role="dialog" aria-modal="true" aria-labelledby="recipe-title"><div class="recipe-dialog panel"><button id="recipe-close" class="modal-x" aria-label="Cerrar receta">✕</button><div id="recipe-detail"></div></div></div>
+ <div id="toast" class="toast" role="status" aria-live="polite"></div>
+ <noscript>Esta aplicación necesita JavaScript para funcionar.</noscript>
+</body>
+</html>
