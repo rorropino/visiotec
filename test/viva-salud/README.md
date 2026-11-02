@@ -2,6 +2,30 @@
 
 Aplicación web responsiva / PWA en **PHP 8.3+, SQLite, JavaScript y CSS**, aislada de otros sistemas. Se entrega como una **versión funcional de pruebas**, no una aplicación clínica certificada.
 
+## Diseño PRO (segunda iteración)
+- Dashboard de estética cinematográfica verde lima, violeta y azul noche, con tarjetas en capas y vista móvil.
+- Fotografías locales comprimidas WebP de entrenamientos y comidas.
+- Video original de introducción (movimiento de cámara sobre imagen) y siete clips originales de movimiento simplificado en MP4/H.264. Los clips son **ilustraciones de apoyo**, no vídeos de técnica profesional ni garantía de ejecución correcta.
+- Objetivos visuales, resumen de entrenamientos reales por día, racha de sesiones verificadas, tendencia de peso con mediciones reales y búsqueda interactiva.
+- Ninguna cifra clínica (porcentaje de grasa, calorías quemadas o masa muscular) es inventada o atribuida a un usuario que no la haya registrado.
+- Compatibilidad con preferencias de reducción de movimiento y vista responsiva.
+
+## Recursos gráficos y licencia
+Imágenes de Unsplash (licencia Unsplash, para uso dentro de la aplicación) alojadas localmente y optimizadas. Fuentes originales de referencia:
+- https://images.unsplash.com/photo-1517836357463-d25dfeac3438
+- https://images.unsplash.com/photo-1518611012118-696072aa579a
+- https://images.unsplash.com/photo-1502904550040-7534597429ae
+- https://images.unsplash.com/photo-1546069901-ba9599a7e63c
+- https://images.unsplash.com/photo-1490645935967-10de6ba17061
+- https://images.unsplash.com/photo-1512621776951-a57141f2eefd
+- https://images.unsplash.com/photo-1533089860892-a7c6f0a88666
+- https://images.unsplash.com/photo-1540189549336-e6e99c3679fe
+- https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b
+- https://images.unsplash.com/photo-1506126613408-eca07ce68773
+- https://images.unsplash.com/photo-1526506118085-60ce8714f8c5
+
+Clips, ilustración del asistente y estética de interfaz elaborados específicamente para este proyecto.
+
 ## Funcionalidad implementada
 - Registro y login con contraseña cifrada (password_hash), sesiones seguras y CSRF.
 - Perfil: objetivo (bajar grasa, definir, ganar músculo, mantener, bienestar), edad, estatura, peso, experiencia, capacidad de flexiones/sentadillas, días y minutos, equipamiento, precauciones y restricciones.

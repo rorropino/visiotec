@@ -1,0 +1,262 @@
+
+/* VIVA LA SALUD — premium visual system. Built over the functional app, no fake metrics. */
+:root{
+ --ink:#f4f7fc;--muted:#9da9b6;--cream:#0b111c;--card:#192235;--dark:#0a1220;--lime:#caff72;
+ --edge:rgba(197,221,255,.12);--shadow:0 18px 45px rgba(2,7,18,.35);
+ --violet:#ca8bff;--aqua:#86edc5;--glass:rgba(28,36,60,.83)
+}
+*{scrollbar-color:#54627a #111826}
+body{font-family:'DM Sans','Segoe UI',sans-serif;background:radial-gradient(ellipse at 78% 5%,#25233d 0,transparent 43%),linear-gradient(135deg,#0e1522 5%,#0c111b 82%);color:var(--ink)}
+h1,h2,h3,.brand strong,.stat-card strong{font-family:Outfit,'Segoe UI',sans-serif;font-weight:800}
+h1,h2,h3{letter-spacing:-.038em}
+p{color:#b6c3cf}
+.sidebar{background:linear-gradient(167deg,#111529 0%,#111421 35%,#0c1822 100%);border-right:1px solid var(--edge);box-shadow:8px 0 35px rgba(4,8,15,.25);width:252px;flex-basis:252px;padding-top:26px}
+.sidebar .brand{margin:0 10px 41px}
+.brand-mark{background:linear-gradient(145deg,#d5ff74 10%,#8ae6b4 56%,#c18bff);box-shadow:0 0 28px #8ae6b439;color:#0b1a21;border-radius:13px}
+.brand strong{font-size:20px;white-space:nowrap;letter-spacing:-.035em}
+.brand small{letter-spacing:.1em;font-size:8px;font-weight:700;white-space:nowrap;color:#aab8c8}
+.sidebar-label{color:#7c8da5;margin-bottom:10px}
+.nav-list{gap:7px}
+.nav-link{padding:14px 17px;color:#c3c6d6;font-weight:700;border:1px solid transparent}
+.nav-link.active{background:linear-gradient(107deg,rgba(54,142,127,.5),rgba(133,245,123,.25));color:#f7fff5;border-color:#91ed9d65;box-shadow:inset 0 1px 1px #d2ffd932,0 8px 22px #0e442b45}
+.nav-link:hover{background:rgba(183,192,237,.09)}
+.sidebar-highlight{position:relative;margin:auto 0 15px;min-height:178px;border:1px solid #a3c5bf36;border-radius:17px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.20)}
+.sidebar-highlight:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0b1729 5%,#0b172993 59%,#3d2d582d 100%)}
+.sidebar-highlight img{width:100%;height:185px;object-fit:cover}
+.sidebar-highlight>div{position:absolute;bottom:13px;left:14px;z-index:1}
+.sidebar-highlight strong{display:block;font-family:Outfit;font-size:20px;line-height:1.03}
+.sidebar-highlight em{font-style:normal;color:var(--lime)}
+.sidebar-highlight small{display:block;font-size:10px;color:#b8c8ce;margin-top:9px}
+.sidebar-bottom{margin-top:0;padding-top:18px}
+.topbar{background:linear-gradient(180deg,rgba(19,19,34,.94),rgba(15,19,31,.89));border-color:var(--edge);height:80px;gap:24px;padding:0 clamp(24px,3vw,45px)}
+.quick-search{height:45px;display:flex;align-items:center;gap:11px;border-radius:24px;border:1px solid #b6c9e42e;background:rgba(255,255,255,.055);padding:0 16px;color:#e5eef2;width:clamp(280px,34vw,470px);box-shadow:inset 0 1px 0 #ffffff0b}
+.quick-search>span{font-size:27px;color:#c9cce2;line-height:0}
+.quick-search input{background:transparent!important;min-height:0!important;padding:0!important;border:0!important;outline:none!important;color:white!important;font-size:12px;width:100%}
+.quick-search input::placeholder{color:#93a0b6}
+.quick-search kbd{white-space:nowrap;font-size:10px;background:#42445d;padding:4px 9px;border-radius:7px}
+.breadcrumb{font-size:10px;color:#8e9aaf;margin-left:auto;white-space:nowrap}
+.breadcrumb span{color:#bada9b}
+.top-actions{flex-shrink:0;color:#ccd9df}
+.avatar{background:linear-gradient(140deg,#739e65,#253e3b);box-shadow:0 0 0 3px #ffffff10;color:#fff}
+.content{max-width:1600px;padding:26px clamp(20px,3vw,46px) 80px}
+.hero{background:#141b2a;min-height:365px;border:1px solid #c5abff44;border-radius:25px;box-shadow:0 25px 65px #01030b78;margin-bottom:11px}
+.hero-photography{position:absolute;inset:0;background:linear-gradient(90deg,#111628 0%,#131929ed 25%,#131b2ec9 46%,#101c2b0c 86%),linear-gradient(0deg,#09121af2 0%,transparent 40%),url('./media/athlete.webp') center 40%/cover no-repeat;opacity:.99}
+.hero-halo{position:absolute;width:560px;height:560px;border-radius:50%;right:2%;top:-120px;background:radial-gradient(circle,#a2d7bc43 0,transparent 62%);mix-blend-mode:screen;pointer-events:none}
+.hero-content{max-width:660px;padding:40px 42px 39px}
+.hero .eyebrow{color:#d0ff9b;margin-bottom:15px}
+.hero h1{font-size:clamp(34px,3.55vw,58px);line-height:1.07;margin-bottom:16px;text-shadow:0 2px 15px #0008}
+.hero h1 em{color:#cafd7b;font-style:normal;text-shadow:0 0 24px #bdf29a33}
+.hero h1 span{color:#fff}
+.hero p{font-size:13px;max-width:510px;color:#d3d8e8;line-height:1.65}
+.hero-actions .btn{border-radius:24px;padding:13px 20px;box-shadow:0 4px 16px #0004}
+.btn-lime{background:linear-gradient(114deg,#dcfa69 0%,#a9f5a8 100%);color:#162021;box-shadow:0 8px 30px #a2ed9d24,inset 0 1px 0 #ffffffad}
+.btn-dark{background:linear-gradient(120deg,#344e54,#1e2a37);border-color:#e5f1f225;color:white}
+.btn-outline{background:rgba(31,39,60,.8);border-color:#b9c5e253;color:#f1f3ff}
+.btn-ghost{background:#ffffff13;color:#fff;border-color:#c5d4fb71}
+.btn:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-2px)}
+.hero-art{width:25%;right:11%;opacity:.48;pointer-events:none;filter:saturate(.8)}
+.core-circle{width:180px;height:180px;background:linear-gradient(150deg,#ccff8b3a,#99ffa822);border-color:#caff7f88;box-shadow:0 0 0 22px #d5ffa50b,0 0 0 70px #cb8bff0b;backdrop-filter:blur(6px)}
+.core-circle span{color:#e7f6e0}
+.core-circle strong{font-size:90px}
+.orbit{border-color:#b7ffc46c}
+.hero-goals{position:absolute;right:23px;top:50%;transform:translateY(-50%);display:grid;gap:8px;width:171px;z-index:2}
+.hero-goals button{border:1px solid #b4b8e270;border-radius:28px;padding:11px 12px;color:#f0f4ff;background:linear-gradient(116deg,#171f3199,#313150c9);backdrop-filter:blur(14px);text-align:left;font-size:11px;font-weight:750;box-shadow:0 4px 20px #0004}
+.hero-goals button:hover{border-color:#d1f7a3;color:#dcffae}
+.section-heading .eyebrow.dark,.eyebrow.dark{color:#b3e49b;font-size:10px}
+.section-heading h2{font-size:23px;color:#f5f6ff}
+.subtle-link{color:#b8f5a5}
+.stat-grid{gap:13px}
+.stat-card{min-height:142px;position:relative;overflow:hidden;border-radius:17px;background:linear-gradient(150deg,#23283cdd,#181d2b 83%);border:1px solid #c8cbe82d;box-shadow:inset 0 1px 0 #ffffff13,0 18px 32px #0002}
+.stat-card:after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-77px;top:-60px;background:#b27ae016;filter:blur(6px)}
+.stat-icon{color:#c5f7a0;filter:drop-shadow(0 0 9px #8de27a48)}
+.stat-label{color:#a5acc0}
+.stat-card strong{color:#f7f4ff}
+.stat-unit,.stat-card small{color:#aab9bd}
+.insights-grid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:13px;margin-top:14px}
+.insight-card{position:relative;min-height:207px;background:linear-gradient(141deg,#25233e,#1b2030 72%);border:1px solid #aaa4d04d;border-radius:19px;padding:19px 21px;box-shadow:inset 0 1px 0 #ffffff15,0 16px 34px #0004;overflow:hidden}
+.insight-card:before{content:"";position:absolute;inset:-80% -90% auto auto;width:290px;height:290px;background:#a390ff26;border-radius:50%;filter:blur(33px)}
+.insight-title{font-weight:800;color:#f5f1ff;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative}
+.insight-title span{font-size:8px;letter-spacing:.06em;color:#b1a6cc}
+.weight-hero{display:flex;align-items:baseline;gap:6px;margin:18px 0 7px;color:#aeb1c6;font-size:10px}
+.weight-hero strong{font-family:Outfit;font-size:34px;color:#f9f9ff;letter-spacing:-.05em}
+.weight-hero strong#focus-target{color:#ccff8c}
+.weight-divider{height:32px;width:1px;background:#7d718e;margin:0 12px}
+.micro-chart{height:46px;overflow:hidden}
+.micro-chart svg{display:block;width:100%;height:100%}
+.insight-card>small{font-size:10px;color:#b6b8cc}
+.activity-week{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;align-items:end;height:103px;margin-top:18px}
+.activity-column{text-align:center;display:flex;align-items:center;justify-content:end;flex-direction:column;gap:8px;font-size:10px;color:#aaa4c3}
+.activity-bar{width:100%;max-width:34px;border-radius:8px 8px 3px 3px;background:linear-gradient(0deg,#a37ae3,#bdf8a2);box-shadow:0 0 20px #b3df982a;min-height:5px}
+.activity-column.empty .activity-bar{background:#ffffff13;box-shadow:none}
+.activity-footer{font-size:11px;color:#b4b8c8;padding-top:10px}
+.activity-footer strong{color:#bdfa9b;font-size:20px}
+.insight-streak{background:linear-gradient(140deg,#38233e,#1d2639 82%)}
+.streak-figure{display:flex;align-items:center;gap:18px;margin-top:26px}
+.streak-ring{flex-shrink:0;border-radius:50%;width:115px;height:115px;border:9px solid #b986f7;background:radial-gradient(circle,#523c5e,#1e2538);box-shadow:0 0 26px #ba75e44f,inset 0 0 15px #9cf6b629;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.streak-ring strong{font-family:Outfit;font-size:44px;line-height:.9;color:#f6edfd}
+.streak-ring span{font-size:10px;color:#dfc5ec}
+.streak-figure h3{font-size:18px;margin:0 0 8px}
+.streak-figure p{font-size:11px;color:#bdb2cf}
+.two-grid .panel,.panel,.habit-card{background:linear-gradient(146deg,#22283a,#171d2d);border:1px solid #d3d4ef31;color:#f6f7fd;box-shadow:inset 0 1px 0 #ffffff12,0 15px 32px #0004}
+.panel p,.habit-card p,.today-plan p,.food-panel p{color:#aebbc5}
+.two-grid .panel{min-height:278px}
+.today-plan,.food-panel{position:relative;isolation:isolate;overflow:hidden}
+.today-plan:before,.food-panel:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#242c3bf9 8%,#21263cf0 48%,#22243b80 75%,#1b253333);z-index:-1}
+.panel-photo,.panel-food-photo{position:absolute;right:-8%;height:100%;width:60%;top:0;object-fit:cover;mask-image:linear-gradient(90deg,transparent,#000 55%);z-index:-2}
+.today-plan h3,.food-panel h3{max-width:70%;font-size:25px}
+.today-plan p,.food-panel p{max-width:62%}
+.today-plan .panel-top,.food-panel .panel-top{position:relative}
+.food-suggestion{color:#d9f2c2;max-width:60%}
+.mini-status{color:#9ddaba}
+.tag-dark{background:#304436;color:#c7ffa5}
+.tag-green{background:#34483c;color:#d1fcb2}
+.tag-light{background:#3a4050;color:#ebecff}
+.tag-lime{background:#c7f47c;color:#172b20}
+.habit-card{background:linear-gradient(140deg,#1c2837,#181d2d)}
+.habit-card strong{color:#f2f5ff}
+.habit-card p{color:#aab4c1}
+.habit-controls button{background:#333e44;color:#c3ff9b}
+.habit-controls input{background:#172333!important;color:#fff!important}
+.page-heading h1{font-size:clamp(40px,4.1vw,62px);color:#f9f8ff}
+.page-heading p{font-size:14px;color:#b5bfcd}
+.page-heading{position:relative}
+.page-heading em{font-style:normal;color:#c7f6a1}
+.training-heading,.progress-heading,.goals-heading{padding:24px 28px;border-radius:23px;min-height:190px;background:radial-gradient(circle at 80% 50%,#4b376443,transparent 43%),linear-gradient(130deg,#20243c,#131b2a);border:1px solid #a0a2db44}
+.training-heading h1,.progress-heading h1,.goals-heading h1{margin-bottom:8px}
+.training-layout{gap:16px}
+.feature-training{background:linear-gradient(115deg,#171d31,#29233c);border:1px solid #bea0d84f;isolation:isolate;border-radius:22px;min-height:520px}
+.workout-photo{position:absolute;z-index:-1;inset:0;background:linear-gradient(0deg,#11182af7 10%,#1a1b32a9 55%,#14182e6b),url('./media/training.webp') center/cover no-repeat}
+.training-circle{display:none}
+.feature-training h2{font-size:40px;margin-top:145px}
+.feature-training>p{color:#d7d7ec}
+.train-facts{border-color:#ffffff40}
+.train-facts span{color:#babcd1}
+.exercise-list{background:linear-gradient(150deg,#22263b,#161e2d)}
+.exercise-item{border-color:#ffffff15}
+.exercise-emoji{background:#3d3a57}
+.exercise-item strong{color:#ecf3f4}
+.exercise-item small,.exercise-item p{color:#a7acba}
+.info-strip{background:#222e37;color:#d3e4c4;border:1px solid #8ecb9544}
+.kitchen-heading{background:linear-gradient(90deg,#192a25 0%,#1a2b28d8 47%,#1b2c1b22 100%),url('./media/food.webp') center/cover;border:1px solid #98b48a55;border-radius:24px;padding:30px;overflow:hidden;min-height:265px}
+.kitchen-heading h1{font-size:clamp(36px,4.5vw,56px)}
+.kitchen-heading p{color:#e4e9d9}
+.kitchen-heading>img{display:none}
+.kitchen-grid{gap:15px}
+.pantry-panel{background:linear-gradient(135deg,#1c3433,#1d2738)}
+.pantry-panel p{color:#bec7cc}
+.pantry-tag{color:#d9ffd0;background:#354c3c;border-color:#81ad8e88}
+.pantry-tag button{color:#dcf4d7}
+.kitchen-ai{background:linear-gradient(127deg,#292143,#4d294c 65%,#37213c);overflow:hidden;position:relative}
+.kitchen-ai h3,.kitchen-ai p,.kitchen-ai label,.kitchen-ai .panel-top,.kitchen-ai textarea,.kitchen-ai .btn,.kitchen-ai .ai-status,.kitchen-ai .ai-answer{position:relative;z-index:2}
+.kitchen-ai p{color:#e5d1e9}
+.ai-mascot{position:absolute;right:-30px;top:-40px;width:210px;height:210px;object-fit:cover;border-radius:50%;opacity:.54;mask-image:radial-gradient(circle,#000 22%,transparent 72%);pointer-events:none}
+.kitchen-ai textarea{background:#ffffff13;color:white}
+.ai-status{color:#e3c8e6}
+.nutrition-panel{background:linear-gradient(135deg,#1c3234,#20243c)}
+.nutrition-item{background:#ffffff0e}
+.nutrition-item strong{color:#b5f2ac}
+.nutrition-item small{color:#b8c2d0}
+.recipe-card{padding:0;text-align:left;position:relative;overflow:hidden;background:linear-gradient(160deg,#24273a,#161d2b);border:1px solid #aeaec94d;border-radius:19px;min-height:300px;transition:.2s}
+.recipe-card:hover{border-color:#aff4a6;transform:translateY(-4px);box-shadow:0 15px 31px #060f23a3}
+.recipe-photo{height:155px;width:100%;object-fit:cover;display:block}
+.recipe-body{padding:16px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;flex:1;width:100%}
+.recipe-card .recipe-icon{display:none}
+.recipe-card h3{color:#fff;font-size:19px;margin:0}
+.recipe-card .ingredients{color:#b6c1ce;margin:0;font-size:11px}
+.recipe-card-bottom{margin-top:auto;color:#bab6cf}
+.recipe-card-bottom strong{color:#b9ff8c}
+.journal-panel{background:#202b38}
+.meal-item{background:#1a2433;border-color:#ffffff1f;color:#f0f3f8}
+.meal-item span{color:#b5eb9a}
+.progress-grid{gap:16px}
+.chart-panel{background:linear-gradient(135deg,#232b40,#1c1e31)}
+.measurement-panel{background:linear-gradient(140deg,#252139,#1a2530)}
+.chart-area .empty-chart{color:#b3bcd1}
+.chart-key{color:#aef5a2}
+.history-item{background:#1e2735;border-color:#ffffff22}
+.history-item strong{color:#f4f7f9}
+.history-item span{color:#b5ec8c}
+.history-item p{color:#b0b9c8}
+.empty-state{background:#1b2231;border-color:#5b6176;color:#a9b9bf}
+.profile-form .panel{background:linear-gradient(140deg,#202940,#1a2230)}
+.step-label{color:#b5fd99}
+.visual-goals{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.visual-goals .choice-card{border-color:#7f849e66;min-height:190px;background:linear-gradient(0deg,#172030f7 3%,#171d2db5 43%,#111b2940),url('./media/runner.webp') center/cover;overflow:hidden;justify-content:flex-end;padding:15px;color:#fff;border-radius:17px;transition:transform .15s}
+.visual-goals .choice-card:hover{transform:translateY(-3px)}
+.visual-goals .choice-card:has(input:checked){border-color:#ceff80;background-color:#1f4232;box-shadow:inset 0 0 0 2px #b7fe86,0 0 28px #adff7c35}
+.visual-goals .choice-card:nth-child(2){background-image:linear-gradient(0deg,#171e2cf7,#151a2a28),url('./media/goal-define.webp')}
+.visual-goals .choice-card:nth-child(3){background-image:linear-gradient(0deg,#171e2cf7,#151a2a28),url('./media/goal-build.webp')}
+.visual-goals .choice-card:nth-child(4){background-image:linear-gradient(0deg,#171e2cf7,#151a2a28),url('./media/goal-health.webp')}
+.visual-goals .choice-card:nth-child(5){background-image:linear-gradient(0deg,#171e2cf7,#151a2a28),url('./media/meditation.webp')}
+.visual-goals .choice-card>span{color:#d1ff91;text-shadow:0 0 18px #000a}
+.visual-goals .choice-card strong{font-size:15px}
+.visual-goals .choice-card small{color:#d7d9e0}
+.checks label{background:#252d40;border-color:#ffffff20;color:#f4f6fa}
+.form-grid label,.form-stack label{color:#c7d4df}
+input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),select,textarea{background:#1b2533!important;border-color:#60708271!important;color:#eaf3ff!important}
+input::placeholder,textarea::placeholder{color:#8999ac}
+input:focus,textarea:focus,select:focus{border-color:#b4f892!important}
+.auth-screen{background:#111722}
+.auth-illustration{background:linear-gradient(0deg,#101b26e8,#121a27bb 40%,#0a152ab2 80%),url('./media/runner.webp') center/cover}
+.auth-illustration .brand,.auth-illustration .auth-slogan{position:relative;z-index:2}
+.auth-illustration .brand{margin-bottom:30px}
+.auth-illustration .brand strong{font-size:25px}
+.auth-slogan h1{font-size:clamp(47px,5vw,78px)}
+.auth-slogan p{color:#d7dfdc}
+.auth-slogan h1 em{color:#ceff92}
+.big-flower{opacity:.06}
+.auth-motion{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45;filter:saturate(1.1)}
+.auth-form-wrap{background:radial-gradient(circle at 80% 15%,#273540 0,transparent 45%),#141a28}
+.auth-box .eyebrow{color:#a6db91}
+.auth-box h2{color:white}
+.auth-box p{color:#b0bccc}
+.auth-switch{background:#222b3c}
+.auth-switch button{color:#adb9cc}
+.auth-switch button.selected{background:#c7f58f;color:#15251e}
+.login-hint{color:#9eb2c0}
+.coach-overlay{background:rgba(6,9,19,.96);backdrop-filter:blur(12px)}
+.coach-modal{width:min(800px,100%);background:linear-gradient(135deg,#1d1a32,#121d2c);border:1px solid #9d88c863;box-shadow:0 18px 95px #000c}
+.coach-header{border-color:#a49bbe34}
+.coach-body{padding-top:22px}
+.coach-demonstration{position:relative;width:min(490px,100%);height:220px;margin:18px auto 11px;background:radial-gradient(circle at 50% 40%,#3e3a62,#141b2b 70%);border:1px solid #8b7cae53;border-radius:22px;overflow:hidden;box-shadow:0 10px 44px #0006,inset 0 0 40px #c08aff13}
+.coach-demonstration video{width:100%;height:100%;object-fit:contain;display:block}
+.demo-overlay{position:absolute;top:13px;left:16px;display:flex;align-items:center;justify-content:space-between;right:16px;pointer-events:none}
+.video-tag{font-size:9px;letter-spacing:.13em;color:#e2f1db;background:#111c2fa9;padding:7px 9px;border-radius:8px;border:1px solid #ffffff20}
+.coach-exercise-icon{width:45px;height:45px;margin:0;background:#caff8d;border:0;font-size:23px}
+.coach-body h2{margin:10px 0;font-size:33px}
+.coach-clock{font-size:64px;color:#fff;text-shadow:0 0 25px #a67dfc33;margin:12px auto 0}
+.coach-next-list{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;max-width:650px;margin:15px auto 0}
+.coach-next-list span{font-size:9px;padding:5px 8px;border:1px solid #c0accd31;border-radius:8px;color:#b4bfd1}
+.coach-next-list span.active{border-color:#ccfc86;color:#ccfc86}
+.coach-progress-track{background:#3a3d5e}
+.coach-progress-track>div{background:linear-gradient(90deg,#b4f6ac,#d793fc)}
+.coach-finish-buttons{flex-wrap:wrap}
+.recipe-dialog{background:#20253b}
+.recipe-dialog h2,.recipe-dialog h3{color:#fff}
+.recipe-dialog .muted-note{color:#b6bed3!important}
+.recipe-dialog .missing{background:#334034;color:#d6edbb}
+.account-danger{background:#35242d;border-color:#71434a}
+.account-danger p{color:#efb2b7}
+.account-danger summary{color:#e1a9b5}
+.toast{background:#132a24;border:1px solid #b5f69a4d}
+.mobile-nav{background:#15192d;border-color:#75819a38;box-shadow:0 -12px 40px #0008}
+.mobile-nav button{color:#aab5c8}
+.mobile-nav button.active{color:#c9ff8b}
+@media(max-width:1350px){.hero-goals{display:none}.hero-art{right:2%;opacity:.27}.insights-grid{grid-template-columns:1fr 1fr}.insight-streak{grid-column:span 2}.streak-figure{margin-top:12px}.quick-search{width:clamp(170px,28vw,390px)}.breadcrumb{display:none}.visual-goals{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:950px){.sidebar{width:210px;flex-basis:210px}.brand strong{font-size:16px}.brand small{font-size:7px}.hero-content{padding:32px}.hero h1{font-size:clamp(34px,5vw,51px)}.hero-goals{display:none}.insights-grid{grid-template-columns:1fr 1fr}.quick-search{min-width:0}.topbar{padding:0 18px}}
+@media(max-width:800px){.sidebar{display:none}.insights-grid{grid-template-columns:1fr 1fr}.topbar{height:67px}.quick-search{width:100%}.content{padding:18px 15px 117px}.hero{min-height:372px}.hero-art{right:-10%;opacity:.27}.hero-photography{background-position:64% center}.hero-content{padding:35px 28px}.hero h1{font-size:clamp(34px,6vw,53px)}.training-heading,.progress-heading,.goals-heading{min-height:0}.visual-goals{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.hero{min-height:438px}.hero-photography{background:linear-gradient(90deg,#151a29 3%,#151b2ce0 56%,#111b2b5e),linear-gradient(0deg,#0c1423d4,transparent),url('./media/athlete.webp') 64% center/cover}.hero-content{padding:31px 22px}.hero h1{font-size:clamp(36px,10vw,45px)}.hero p{font-size:12px;max-width:290px}.hero-art{display:none}.hero-actions{max-width:270px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-card{padding:17px 14px;min-height:142px}.insights-grid{grid-template-columns:1fr}.insight-streak{grid-column:auto}.insight-card{min-height:185px}.two-grid{grid-template-columns:1fr}.today-plan h3,.food-panel h3{max-width:76%}.today-plan p,.food-panel p,.food-suggestion{max-width:70%}.panel-photo,.panel-food-photo{width:58%;right:-10%}.recipe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.recipe-card{min-height:240px}.recipe-photo{height:105px}.recipe-card h3{font-size:15px}.recipe-body{padding:13px;gap:5px}.recipe-card .ingredients{font-size:10px}.recipe-card-bottom{align-items:flex-start;flex-direction:column;gap:5px}.visual-goals{grid-template-columns:repeat(2,minmax(0,1fr))}.visual-goals .choice-card{min-height:185px}.kitchen-heading{padding:23px;min-height:255px}.kitchen-heading h1{font-size:36px}.kitchen-heading p{max-width:260px}.training-heading,.progress-heading,.goals-heading{padding:24px 20px}.page-heading h1{font-size:36px}.coach-demonstration{height:178px}.coach-clock{font-size:55px}.auth-motion{opacity:.4}.auth-illustration{min-height:240px}.auth-slogan h1{font-size:41px}.auth-box h2{font-size:34px}}
+@media(prefers-reduced-motion:reduce){.auth-motion{display:none!important}}
+
+.ui-icon{height:21px;width:21px;display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.nav-link .ui-icon{height:21px;width:21px}
+.mobile-nav .ui-icon{height:23px;width:23px}
+.stat-icon .ui-icon{height:22px;width:22px}
+.habit-icon .ui-icon{height:26px;width:26px;stroke:#baeba3}
+.exercise-emoji .ui-icon{height:25px;width:25px;stroke:#bff4c3}
+.coach-exercise-icon .ui-icon{width:22px;height:22px;stroke:#244037}
+.hero button:focus-visible,.choice-card:focus-within{outline:2px solid #b9f88b;outline-offset:2px}
+
+.pantry-panel h3 .ui-icon,.chart-panel h3 .ui-icon{color:#b7f0a0;vertical-align:middle;margin-right:4px}
+.nutrition-item .ui-icon{width:23px;height:23px;color:#baf2a9}
+@media(max-width:560px){.topbar .quick-search kbd{display:none}.topbar .quick-search{min-width:0}.topbar .top-actions>span{display:none}}

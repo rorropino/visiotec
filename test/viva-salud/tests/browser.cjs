@@ -24,6 +24,10 @@ const assert=require('assert');
  await page.click('input[name=goal][value=bajar]');
  await page.click('#profile-form button[type=submit]');
  await page.waitForSelector('#view-inicio.active');
+ const heroBackground=await page.$eval('.hero-photography',el=>getComputedStyle(el).backgroundImage);
+ assert(heroBackground.includes('athlete.webp'),'Missing premium hero photo');
+ assert(await page.$eval('.insights-grid',el=>getComputedStyle(el).display)==='grid','Insights not rendered');
+
  await page.screenshot({path:'/tmp/viva-dashboard-desktop.png',fullPage:true});
  await page.click('button[data-tab=comer]');
  await page.waitForSelector('#view-comer.active');
@@ -31,6 +35,9 @@ const assert=require('assert');
  await page.click('#pantry-form button');
  await page.waitForFunction(()=>document.querySelector('#pantry-count').textContent.includes('1 ingredientes'));
  await page.waitForSelector('.recipe-card');
+ await page.waitForFunction(()=>Array.from(document.querySelectorAll('.recipe-photo')).every(img=>img.complete && img.naturalWidth>0),{timeout:10000});
+ await page.screenshot({path:'/tmp/viva-kitchen.png',fullPage:true});
+
  await page.click('.recipe-card');
  await page.waitForSelector('#recipe-modal:not([hidden])');
  await page.click('#recipe-close');
@@ -42,8 +49,13 @@ const assert=require('assert');
  await page.waitForSelector('#view-entrenar.active');
  await page.click('#open-coach');
  await page.waitForSelector('#coach-overlay:not([hidden])');
+ await page.waitForFunction(()=>document.querySelector('#coach-demo')?.readyState>=2,{timeout:10000});
+ await page.screenshot({path:'/tmp/viva-coach.png',fullPage:false});
+
  await page.click('#coach-play');
  await new Promise(r=>setTimeout(r,1300));
+ assert(await page.$eval('#coach-demo',x=>x.currentTime)>0,'Trainer demonstration video did not play');
+
  const clock=await page.$eval('#coach-timer',el=>el.textContent);
  assert(clock!== '03:00','Timer did not start');
  await page.click('#coach-exit');
