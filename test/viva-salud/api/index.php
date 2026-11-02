@@ -5,6 +5,9 @@ $action=clean($_GET['action']??'',40);
 
 try {
  switch($action) {
+ case 'health':
+  $check=db()->query('SELECT 1')->fetchColumn();
+  out(['database'=>$check?'ok':'error']);
  case 'session':
   $id=(int)($_SESSION['uid']??0);
   $user=$id?one('SELECT id,email FROM users WHERE id=?',[$id]):null;

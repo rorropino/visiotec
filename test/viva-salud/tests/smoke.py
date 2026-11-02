@@ -29,6 +29,7 @@ def call(action, body=None, expected=200):
     checks+=1
     return payload
 
+assert call("health")["database"]=="ok"
 s=call("session")
 csrf=s["csrf"]
 assert s["user"] is None
