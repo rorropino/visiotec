@@ -1,5 +1,5 @@
-const CACHE='viva-salud-static-v6';
-const STATIC=['./','./index.html','./assets/styles.css?v=6','./assets/pro.css?v=6','./assets/studio.css?v=6','./assets/fidelity.css?v=6','./assets/sprite-coach.js?v=6','./assets/app.js?v=6','./assets/icons.svg','./assets/icon.svg','./assets/media/viva-sprites-clean.webp?v=7','./manifest.webmanifest'];
+const CACHE='viva-salud-static-v8';
+const STATIC=['./','./index.html','./assets/styles.css?v=8','./assets/pro.css?v=8','./assets/studio.css?v=8','./assets/fidelity.css?v=8','./assets/sprite-coach.js?v=8','./assets/app.js?v=8','./assets/icons.svg','./assets/icon.svg','./assets/media/viva-sprites-clean.webp?v=7','./manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(STATIC)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('viva-salud-static-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{

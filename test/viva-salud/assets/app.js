@@ -24,7 +24,7 @@
  async function refresh(){state.data=await api('dashboard');state.profile=state.data.profile;renderAll();}
  function setAuthMode(register){state.register=register;$('switch-login').classList.toggle('selected',!register);$('switch-register').classList.toggle('selected',register);$('auth-title').textContent=register?'Tu mejor versión comienza aquí.':'Qué bueno verte.';$('auth-submit').textContent=register?'Crear mi cuenta →':'Entrar a mi espacio →';document.querySelectorAll('.register-only').forEach(el=>el.hidden=!register);$('auth-name').required=register;$('auth-password').autocomplete=register?'new-password':'current-password';}
  function showApp(user){state.user=user;$('auth-screen').hidden=!!user;$('app').classList.toggle('is-hidden',!user);if(user)tab('inicio');}
- function tab(name) {if(!['inicio','entrenar','comer','progreso','perfil'].includes(name))return;if(state.tab==='entrenar' && name!=='entrenar' && state.trainer?.playing){stopTick();renderCoach();}state.tab=name;document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'});if(name==='entrenar'&&state.data&&!state.trainer)startCoach(true);}
+ function tab(name) {if(!['inicio','entrenar','comer','progreso','perfil'].includes(name))return;if(state.tab==='entrenar' && name!=='entrenar'){if(state.trainer?.playing){stopTick();renderCoach();}const coachVideo=$('coach-demo');if(coachVideo&&!coachVideo.paused)coachVideo.pause();}state.tab=name;document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'});if(name==='entrenar'&&state.data){if(!state.trainer)startCoach(true);else renderCoach();}}
  function renderAll(){const d=state.data;if(!d)return;const p=d.profile;
   $('welcome-name').textContent=shortName(p.display_name);$('sidebar-user-name').textContent=shortName(p.display_name);$('sidebar-user-avatar').textContent=String(p.display_name||'V')[0].toUpperCase();$('sidebar-user-detail').textContent=({principiante:'Iniciando',intermedio:'Nivel intermedio',avanzado:'Nivel avanzado'})[p.experience]||'Tu plan personal';$('go-profile').textContent=(p.display_name||'V').trim()[0].toUpperCase();
   $('today-caption').textContent=new Intl.DateTimeFormat('es-CL',{weekday:'short',day:'numeric',month:'short',timeZone:'America/Santiago'}).format(new Date());
@@ -203,7 +203,12 @@
    else if(name.includes('remo'))mode='row';
    if(seg.phase==='RECUPERACIÓN')mode='rest';
    if(seg.phase==='VUELTA A LA CALMA'||seg.phase==='Calentamiento')mode='march';
-   const sprite=window.VivaSprite?.hasMode(mode);
+   // Local MP4 from AI-drawn poses; no per-session generation or paid model credits.
+   const cinematicModes=['squat','pushup','bridge','birddog'];
+   const videoModes=['squat','pushup','bridge','birddog','incline','plank','heels','balance','row'];
+   const useVideo=videoModes.includes(mode);
+   const videoUrl='./assets/media/'+(cinematicModes.includes(mode)?'guide-':'demo-')+mode+'.mp4?v=8';
+   const sprite=window.VivaSprite?.hasMode(mode) && (!useVideo || demo.dataset.failedSource===videoUrl);
    const info=$('studio-technique'),tip=$('studio-technique-text');
    if(info&&tip){info.hidden=seg.phase==='RECUPERACIÓN';tip.textContent=String(seg.tip||'').split(' Alternativa:')[0];}
    const canvas=$('coach-sprite');
@@ -211,15 +216,23 @@
    const showRest=mode==='rest';
    canvas.hidden=!sprite;rest.hidden=!showRest;demo.hidden=!!sprite||showRest;
    if(sprite){
-     demo.pause();
+     if(!demo.paused)demo.pause();
      window.VivaSprite?.setMode(mode);
      canvas.setAttribute('aria-label','Animación del ejercicio: '+seg.title);
    }else if(showRest){
-     demo.pause();
-   }else{
-     const url='./assets/media/demo-'+mode+'.mp4';
-     if(demo.dataset.source!==url){demo.dataset.source=url;demo.src=url;demo.load();}
-     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)demo.play().catch(()=>{});
+     if(!demo.paused)demo.pause();
+   }else if(useVideo){
+     if(demo.dataset.source!==videoUrl){
+       demo.dataset.failedSource='';
+       demo.dataset.source=videoUrl;
+       demo.src=videoUrl;
+       demo.load();
+       demo.setAttribute('aria-label','Video en bucle con una demostración ilustrativa de '+seg.title);
+       demo.poster='./assets/media/exercise/'+({'squat':'thumb-squat','pushup':'thumb-pushup','bridge':'thumb-bridge','birddog':'thumb-birddog','incline':'thumb-pushup','plank':'thumb-plank','heels':'thumb-heels','balance':'thumb-balance','row':'thumb-row'}[mode]||'thumb-march')+'.webp';
+     }
+     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches && demo.paused && !document.hidden && state.tab==='entrenar'){
+       demo.play().catch(()=>{/* Poster visible if autoplay is blocked */});
+     }
    }
    if(t.lastRenderedIndex!==t.index){
      const ghostLeft=document.querySelector('.studio-ghost-left'),ghostRight=document.querySelector('.studio-ghost-right');
@@ -276,6 +289,15 @@
   $('water-minus').onclick=()=>{const h=state.data.habits.find(x=>x.day===today());saveHabit({water:Math.max(0,(Number(h?.water)||0)-1)});};
   $('water-plus').onclick=()=>{const h=state.data.habits.find(x=>x.day===today());saveHabit({water:Math.min(20,(Number(h?.water)||0)+1)});};
   $('sleep-save').onclick=()=>saveHabit({sleep:$('sleep-hours').value===''?null:Number($('sleep-hours').value)});
+  $('coach-demo').addEventListener('error',()=>{
+    const demo=$('coach-demo'),mode=demo.dataset.source?.match(/(?:guide-|demo-)([a-z]+)\.mp4/)?.[1];
+    if(window.VivaSprite?.hasMode(mode)){
+      demo.dataset.failedSource=demo.dataset.source;
+      demo.hidden=true;
+      $('coach-sprite').hidden=false;
+      window.VivaSprite?.setMode(mode);
+    }else{demo.poster='./assets/media/training.webp';}
+  });
   $('open-coach').onclick=()=>startCoach(false);$('coach-exit').onclick=exitCoach;$('coach-play').onclick=playPause;$('coach-next').onclick=()=>nextCoach(false);$('coach-prev').onclick=prevCoach;$('coach-discard').onclick=exitCoach;$('coach-save').onclick=saveCoach;
   $('coach-rpe').oninput=()=>$('coach-rpe-label').textContent=$('coach-rpe').value;
   $('export-data').onclick=async()=>{try{const data=await api('export');const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='viva-salud-mis-datos-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('Exportación descargada.');}catch(e){toast(e.message,true);}};

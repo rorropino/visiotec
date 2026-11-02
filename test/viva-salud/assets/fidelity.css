@@ -261,3 +261,8 @@ h1,h2,h3,.studio-title h1,.studio-side-card h3,.studio-footer-goal h3{font-famil
 .studio-footer-symbol .ui-icon{width:36px;height:36px;stroke:#ffe36a;stroke-width:1.7;filter:drop-shadow(0 0 13px #ffcb5160)}
 .studio-footer-goal .studio-footer-progress-rail{background:#544e81}
 @media(max-width:560px){.studio-coach-stage .voice-toggle{margin:3px 0 0!important;font-size:9px}}
+
+/* Crisp lightweight H.264 exercise loops: preserve hands and feet. */
+.studio-coach-stage .studio-demonstration video#coach-demo{object-fit:contain;background:#0e1b2a;mix-blend-mode:normal;position:relative;z-index:3;border-radius:12px;width:100%;height:100%;}
+.studio-coach-stage .studio-demonstration video#coach-demo[hidden]{display:none!important;}
+.studio-coach-stage .studio-demonstration .studio-ghost:has(~ video#coach-demo:not([hidden])){opacity:.08}

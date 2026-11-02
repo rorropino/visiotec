@@ -68,26 +68,34 @@ const assert=require('assert');
  assert(before!==after,'Sprite must advance through animation frames');
  await page.screenshot({path:'/tmp/viva-coach.png',fullPage:false});
  await page.click('#coach-next');
- assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='squat','First exercise must show chair squat');
+ await page.waitForFunction(()=>!document.querySelector('#coach-demo').hidden && document.querySelector('#coach-demo').readyState>=2,{timeout:12000});
+ assert(await page.$eval('#coach-demo',e=>e.currentSrc.includes('guide-squat.mp4')),'Squat must use its smooth MP4 loop');
+ assert(await page.$eval('#coach-demo',e=>e.loop),'Video must loop');
  assert((await page.$eval('#coach-title',x=>x.textContent)).toLowerCase().includes('sentadilla'));
  await page.click('#coach-next');
  assert(await page.$eval('#coach-rest-visual',x=>!x.hidden),'Rest period must show breathing animation');
  await page.click('#coach-next');
- assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='pushup','Pushups must show wall pushup');
+ await page.waitForFunction(()=>!document.querySelector('#coach-demo').hidden && document.querySelector('#coach-demo').readyState>=2,{timeout:12000});
+ assert(await page.$eval('#coach-demo',e=>e.currentSrc.includes('guide-pushup.mp4')),'Wall pushups must use guide video');
  await page.screenshot({path:'/tmp/viva-fidelity-pushup.png',fullPage:false});
 
- assert(await page.$eval('#coach-sprite',x=>!x.hidden),'Character sprite must be visible');
+ assert(await page.$eval('#coach-demo',x=>!x.hidden),'Training actor video must be visible');
+ const begin=await page.$eval('#coach-demo',x=>x.currentTime);
+ await new Promise(r=>setTimeout(r,550));
+ const end=await page.$eval('#coach-demo',x=>x.currentTime);
+ assert(end>begin,'Video must actually animate (not freeze)');
  await page.click('#coach-play');
  await new Promise(r=>setTimeout(r,1300));
  const clock=await page.$eval('#coach-timer',el=>el.textContent);
  assert(clock!== '03:00','Timer did not start');
- for(const [visual,expected] of [['rest',null],['sprite','bridge'],['rest',null],['sprite','birddog'],['rest',null],['video',null]]){
+ for(const [visual,expected] of [['rest',null],['video','bridge'],['rest',null],['video','birddog'],['rest',null],['video','heels']]){
    await page.click('#coach-next');
    if(visual==='rest')assert(await page.$eval('#coach-rest-visual',x=>!x.hidden),'Rest breathing visual missing');
-   if(visual==='sprite')assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode===expected,'Wrong sprite '+expected);
+
    if(visual==='video'){
      assert(await page.$eval('#coach-demo',x=>!x.hidden),'Missing custom animation for heel raises');
-     await page.waitForFunction(()=>document.querySelector('#coach-demo').readyState>=2,{timeout:8000});
+     await page.waitForFunction(()=>document.querySelector('#coach-demo').readyState>=2,{timeout:12000});
+     if(expected)assert(await page.$eval('#coach-demo',(el,expected)=>el.currentSrc.includes((expected==='heels'?'demo-':'guide-')+expected+'.mp4'),expected),'Wrong exercise video: '+expected);
    }
  }
 
@@ -112,11 +120,12 @@ const assert=require('assert');
  assert(nextRect.top>=0 && nextRect.bottom<=nextRect.viewport,'Next button not visible on mobile: '+JSON.stringify(nextRect));
  await page.screenshot({path:'/tmp/viva-coach-mobile.png',fullPage:false});
  await page.click('#coach-next');
- assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='squat','Mobile next must change exercise sprite');
+ await page.waitForFunction(()=>document.querySelector('#coach-demo').readyState>=2 && !document.querySelector('#coach-demo').hidden,{timeout:12000});
+ assert(await page.$eval('#coach-demo',x=>x.currentSrc.includes('guide-squat.mp4')),'Mobile next must change to squat MP4');
  await page.click('#coach-exit');
 
  assert(errors.length===0,'Browser JS errors: '+errors.join(' | '));
- console.log('PASS: browser + 5-sprite atlas, warmup, squat, rest, pushups, timer, recipes, measurements, responsive layout');
+ console.log('PASS: browser + hybrid sprite/5 exercise MP4 loops, warmup, squat, rest, pushups, bridge, bird dog, timer, recipes, measurements, mobile');
  }catch(e){console.error('FAIL:',e.message,errors);process.exitCode=1;}
  finally{if(browser)await browser.close();}
 })();

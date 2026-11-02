@@ -98,3 +98,10 @@ Esta versión no ofrece evaluación médica, diagnóstico, estimaciones de calor
 - UI de entrenamiento refinada contra la referencia: topbar con acciones reales y racha calculada, navegación ampliada sin funciones falsas, panel central de entrenamiento visual con sprites reales, tarjetas siguientes y objetivo con progreso de sesiones real.
 - Estadísticas de peso solo con mediciones propias; ningún porcentaje inventado. Hidratación: volumen estimado de 250 ml/vaso (no meta de consumo prescrita).
 - La galería original de 25 miniaturas específicas pesa menos de 120 KB y no requiere red externa. La foto de atardecer usada en el lateral procede de https://images.unsplash.com/photo-1500534623283-312aade485b7 (Unsplash License).
+
+### Biblioteca de video local (movimiento v8)
+- Ejercicios principales: cinco MP4 H.264 en loop, 20 fps: guide-march.mp4, guide-squat.mp4, guide-pushup.mp4, guide-bridge.mp4 y guide-birddog.mp4.
+- Se generan localmente a partir de ilustraciones IA previas, con interpolación y secuencias reversibles de bajada/subida. No son video generativo continuo ni requieren suscripción.
+- Marcha y movilidad en sprite; cuatro movimientos principales con MP4; descansos con animación CSS; otros movimientos con clips ilustrativos locales.
+- Bucle automático, miniatura de respaldo, cambios por siguiente/temporizador. Respeta preferencias de movimiento reducido.
+- No sustituye instrucción profesional de técnica o prescripción médica.
