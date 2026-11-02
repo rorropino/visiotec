@@ -31,15 +31,13 @@ Definir en entorno PHP del **servidor**:
 
 Solo se aceptan modelos `openrouter/free` o `:free` y se limitan a **3 solicitudes por usuario al día**. Si no hay credencial, la app sigue funcionando con recomendaciones locales y declara de forma explícita que la IA generativa está desactivada. Nunca colocar la clave en JS o HTML.
 
-### Publicación mediante GitHub Actions
-- CI en `.github/workflows/viva-salud.yml` ante cambios en la rama `test/viva-salud`.
-- Despliegue SFTP/SSH **manual** con `workflow_dispatch`, después de tests.
-- Secretos requeridos para publicar (todos se configuran en GitHub Actions Secrets):
-  - `VIVA_SSH_HOST`, `VIVA_SSH_USER`, `VIVA_SSH_PRIVATE_KEY`,
-  - `VIVA_SSH_KNOWN_HOSTS` (host key verificada, no generar en el runner),
-  - `VIVA_DEPLOY_PATH` (ruta absoluta real de la carpeta `viva-salud` de test.visiotec.cl).
-- Sin estos datos, la rama queda en GitHub pero **no se afirma que la app esté desplegada**.
-- El deploy usa rsync sobre SSH **sin --delete** y excluye tests, archivos privados, claves y bases de datos.
+### Publicación mediante GitHub Actions (integración real)
+- El **código fuente** vive en `rorropino/visiotec`, rama `test/viva-salud`. Su workflow `.github/workflows/viva-salud.yml` ejecuta CI, sin usar credenciales de hosting.
+- El subdominio `test.visiotec.cl` se publica desde el repositorio privado **`rorropino/testers`**, rama `test`, mediante el workflow existente `Deploy SGSE TEST to cPanel` y sus secretos CPANEL existentes.
+- Ese workflow descarga este proyecto por Git y publica **solo** `/viva-salud/` dentro de `CPANEL_TEST_PATH`, además del sistema SGSE. Las reglas SGSE permiten la ruta y la limpieza respeta la carpeta independiente.
+- Para desplegar una nueva versión de Viva la Salud, actualizar su rama en `visiotec` y volver a ejecutar el workflow de `testers` (o realizar un commit de actualización en la rama de prueba que lo active).
+- Se valida por HTTPS `/viva-salud/api/index.php?action=health`, verificando también que la SQLite privada responda. Si falla, no se debe considerar exitosa la publicación.
+- No agregar credenciales a JS, HTML ni Git. La IA externa requiere variable de entorno privada en hosting.
 
 ### Desarrollo y pruebas
 Local bajo un host que sirva la ruta `/viva-salud/`.
