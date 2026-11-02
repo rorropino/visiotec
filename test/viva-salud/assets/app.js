@@ -24,7 +24,7 @@
  async function refresh(){state.data=await api('dashboard');state.profile=state.data.profile;renderAll();}
  function setAuthMode(register){state.register=register;$('switch-login').classList.toggle('selected',!register);$('switch-register').classList.toggle('selected',register);$('auth-title').textContent=register?'Tu mejor versión comienza aquí.':'Qué bueno verte.';$('auth-submit').textContent=register?'Crear mi cuenta →':'Entrar a mi espacio →';document.querySelectorAll('.register-only').forEach(el=>el.hidden=!register);$('auth-name').required=register;$('auth-password').autocomplete=register?'new-password':'current-password';}
  function showApp(user){state.user=user;$('auth-screen').hidden=!!user;$('app').classList.toggle('is-hidden',!user);if(user)tab('inicio');}
- function tab(name) {if(!['inicio','entrenar','comer','progreso','perfil'].includes(name))return;if(state.tab==='entrenar' && name!=='entrenar' && state.trainer?.playing){stopTick();renderCoach();}state.tab=name;document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));$('current-tab-title').textContent={inicio:'MI DÍA',entrenar:'ENTRENAR',comer:'ALIMENTACIÓN',progreso:'MI EVOLUCIÓN',perfil:'MI PLAN'}[name];window.scrollTo({top:0,behavior:'smooth'});if(name==='entrenar'&&state.data&&!state.trainer)startCoach(true);}
+ function tab(name) {if(!['inicio','entrenar','comer','progreso','perfil'].includes(name))return;if(state.tab==='entrenar' && name!=='entrenar' && state.trainer?.playing){stopTick();renderCoach();}state.tab=name;document.querySelectorAll('[data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'});if(name==='entrenar'&&state.data&&!state.trainer)startCoach(true);}
  function renderAll(){const d=state.data;if(!d)return;const p=d.profile;
   $('welcome-name').textContent=shortName(p.display_name);$('sidebar-user-name').textContent=shortName(p.display_name);$('sidebar-user-avatar').textContent=String(p.display_name||'V')[0].toUpperCase();$('sidebar-user-detail').textContent=({principiante:'Iniciando',intermedio:'Nivel intermedio',avanzado:'Nivel avanzado'})[p.experience]||'Tu plan personal';$('go-profile').textContent=(p.display_name||'V').trim()[0].toUpperCase();
   $('today-caption').textContent=new Intl.DateTimeFormat('es-CL',{weekday:'short',day:'numeric',month:'short',timeZone:'America/Santiago'}).format(new Date());
@@ -60,9 +60,9 @@
   if(state.tab==='entrenar'&&!state.trainer)startCoach(true);
  }
  function studioExercisePreview(id){
-  const rows={marcha:0,sentadilla:25,pared:50,puente:75,bird:100};
-  if(Object.prototype.hasOwnProperty.call(rows,id))return '<span class="exercise-sprite-mini" aria-hidden="true" style="background-position:0% '+rows[id]+'%"></span>';
-  return exerciseIcon(id);
+  const photos={marcha:'march',sentadilla:'squat',pared:'pushup',puente:'bridge',bird:'birddog',plancha:'plank',talones:'heels',equilibrio:'balance',remo:'row'};
+  const key=photos[id];
+  return key?'<img class="studio-exercise-photo" loading="lazy" alt="" src="./assets/media/exercise/thumb-'+key+'.webp">':exerciseIcon(id);
  }
  function studioStepList(){
   const d=state.data,plan=d.plan,t=state.trainer;
@@ -81,22 +81,37 @@
   $('studio-days').textContent=p.weekly_days;
   $('studio-done').textContent=weekly;
   $('studio-ex-count').textContent=d.plan.exercises.length;
-  $('studio-total-sessions').textContent=logs.length;
+  $('studio-plan-minutes').textContent=d.plan.approx_minutes;
+  const programDay=Math.min((new Set(logs.map(x=>x.day))).size+1,Number(p.weekly_days)||3);
+  $('studio-day-badge').textContent='Día '+programDay+' de '+p.weekly_days;
+  $('studio-footer-week').textContent=weekly+' / '+p.weekly_days;
+  $('studio-footer-bar').style.width=Math.min(100,Math.round(weekly/Math.max(1,p.weekly_days)*100))+'%';
+  $('studio-footer-goal-copy').textContent=(goalNames[p.goal]||'Bienestar')+' · Más fuerza · Mejor salud';
   $('studio-weight').textContent=weight!==null && weight!=='' && Number.isFinite(+weight)?money(weight)+' kg':'Sin registro';
-  $('studio-target').textContent=p.target_kg?money(p.target_kg)+' kg':'Sin definir';
+  $('studio-target').textContent=p.target_kg?'Meta: '+money(p.target_kg)+' kg':'Meta sin definir';
+  const first=measures[0]?.weight_kg, latest=weight, target=p.target_kg;
+  const validStart=Number.isFinite(Number(first))&&first!=null;
+  const difference=validStart&&Number.isFinite(Number(latest))?Number(first)-Number(latest):null;
+  $('studio-weight-change').textContent=difference===null||measures.length<2?'—':(difference>0?'−':difference<0?'+':'')+money(Math.abs(difference))+' kg';
+  const hasGoal=validStart&&target!=null&&Number.isFinite(Number(target))&&Math.abs(Number(first)-Number(target))>=.1;
+  const percent=hasGoal?Math.max(0,Math.min(100,Math.round((Number(first)-Number(latest))/(Number(first)-Number(target))*100))):null;
+  $('studio-goal-progress').textContent=percent===null?'—':percent+'%';
+  $('studio-weight-foot').textContent=percent===null?'Tu avance se calcula con tus mediciones':'Según tu peso inicial, actual y meta';
   const recipe=d.recipes?.[0],lastMeal=d.meals?.find(m=>m.day===today());
   $('studio-food-name').textContent=lastMeal?'Registraste: '+lastMeal.description:recipe?'Idea para hoy: '+recipe.name:'Explora recetas según tu despensa';
   const h=d.habits.find(x=>x.day===today())||{water:0};
   const water=Math.max(0,Number(h.water)||0);
-  $('studio-water').textContent=water+' vasos';
+  $('studio-water').textContent=water+' vasos · '+(water*250)+' ml estimados';
   $('studio-water-dots').innerHTML=Array.from({length:8},(_,i)=>'<i class="'+(i<Math.min(water,8)?'filled':'')+'"></i>').join('');
-  $('studio-weight-foot').textContent=measures.length>1?'Datos obtenidos de tus mediciones registradas':'Sin estimaciones ni métricas inventadas';
+
   const chart=$('studio-weight-chart');
   if(measures.length>=2){
    const m=measures.slice(-16),v=m.map(x=>Number(x.weight_kg)),min=Math.min(...v)-.7,max=Math.max(...v)+.7;
    const pts=v.map((y,i)=>(8+i/(v.length-1)*272).toFixed(2)+','+(82-(y-min)/(max-min)*71).toFixed(2)).join(' ');
    chart.innerHTML='<svg role="img" aria-label="Tendencia de peso según tus registros" viewBox="0 0 290 95" preserveAspectRatio="none"><defs><linearGradient id="studio-chart-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#68fa79" stop-opacity=".3"/><stop offset="1" stop-color="#68fa79" stop-opacity="0"/></linearGradient></defs><path d="M8,86L282,86" stroke="#52617a" stroke-width="1"/><polygon points="8,86 '+pts+' 280,86" fill="url(#studio-chart-fill)"/><polyline points="'+pts+'" fill="none" stroke="#7af76b" stroke-width="3" stroke-linejoin="round"/></svg>';
-  }else{chart.innerHTML='<p>Necesitas dos mediciones para visualizar el progreso.</p>';}
+  }else if(measures.length===1){
+    chart.innerHTML='<svg role="img" aria-label="Una medición registrada: '+esc(measures[0].weight_kg)+' kilogramos" viewBox="0 0 290 95" preserveAspectRatio="none"><path d="M8 21H281 M8 48H281 M8 77H281" stroke="#33465b" stroke-dasharray="4 4"/><circle cx="142" cy="48" r="6" fill="#95ff72"/><text x="153" y="41" font-size="12" fill="#cbff9b">'+esc(money(measures[0].weight_kg))+' kg</text><text x="8" y="91" font-size="10" fill="#9fbbd4">Agrega otra medición para ver la curva</text></svg>';
+  }else{chart.innerHTML='<div class="studio-chart-empty"><span>Tu primera medición activará el gráfico.</span><button type="button" id="studio-measure-cta" class="studio-text-link">Registrar peso ↗</button></div>';}
   renderStudioRoutine();
  }
  function renderStudioRoutine(){
@@ -129,7 +144,7 @@
   $('weekly-bars').innerHTML=days.map((label,i)=>{const day=new Date(monday);day.setDate(monday.getDate()+i);const id=day.getFullYear()+'-'+String(day.getMonth()+1).padStart(2,'0')+'-'+String(day.getDate()).padStart(2,'0');const matching=logs.filter(w=>w.day===id);const mins=matching.reduce((s,w)=>s+Number(w.minutes||0),0);const h=mins?Math.min(96,Math.max(24,16+mins*1.45)):8;return '<div class="activity-column '+(mins?'':'empty')+'"><div class="activity-bar" style="height:'+h+'px" title="'+mins+' minutos el '+esc(label)+'"></div><span>'+label+'</span></div>';}).join('');
   const unique=new Set(logs.map(x=>x.day));const pointer=new Date(now);if(!unique.has(today()))pointer.setDate(pointer.getDate()-1);let streak=0;
   for(let i=0;i<120;i++){const id=pointer.getFullYear()+'-'+String(pointer.getMonth()+1).padStart(2,'0')+'-'+String(pointer.getDate()).padStart(2,'0');if(!unique.has(id))break;streak++;pointer.setDate(pointer.getDate()-1);}
-  $('streak-days').textContent=streak;$('streak-copy').textContent=streak===0?'Empieza tu racha con una sesión posible para ti.':streak===1?'¡Ya empezaste! Hoy sumaste un día.':'Llevas '+streak+' días seguidos con sesiones registradas.';
+  $('studio-header-streak').textContent=streak+' día'+(streak===1?'':'s');$('studio-notification-dot').hidden=!!logs.find(x=>x.day===today());$('streak-days').textContent=streak;$('streak-copy').textContent=streak===0?'Empieza tu racha con una sesión posible para ti.':streak===1?'¡Ya empezaste! Hoy sumaste un día.':'Llevas '+streak+' días seguidos con sesiones registradas.';
   const measures=d.measurements.slice(-16);const spark=$('weight-sparkline');
   if(measures.length>1){const vals=measures.map(x=>Number(x.weight_kg));const lo=Math.min(...vals)-.5,hi=Math.max(...vals)+.5;const pts=vals.map((v,i)=>(10+380*i/(vals.length-1)).toFixed(1)+','+(43-(v-lo)/(hi-lo)*34).toFixed(1)).join(' ');spark.innerHTML='<svg viewBox="0 0 400 54" preserveAspectRatio="none" role="img" aria-label="Tendencia de peso registrado"><polyline points="'+pts+'" fill="none" stroke="#c3a1f5" stroke-width="3"/><line x1="0" y1="52" x2="400" y2="52" stroke="#ffffff30"/></svg>';}else{spark.innerHTML='<div style="font-size:10px;color:#acb3c6;padding-top:11px">Registra mediciones para ver tu tendencia ↗</div>';}
   $('weight-context').textContent=measures.length>1?'Solo tus mediciones, sin valores estimados.':'Tu progreso se construye paso a paso.';
@@ -207,11 +222,21 @@
      if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)demo.play().catch(()=>{});
    }
    if(t.lastRenderedIndex!==t.index){
+     const ghostLeft=document.querySelector('.studio-ghost-left'),ghostRight=document.querySelector('.studio-ghost-right');
+     const modeImages=['march','squat','pushup','bridge','birddog'];
+     const visualMode=modeImages.includes(mode)?mode:null;
+     [ghostLeft,ghostRight].forEach((el,i)=>{el.hidden=!visualMode;if(visualMode)el.style.backgroundImage='url("./assets/media/exercise/'+visualMode+'-'+(i?'end':'start')+'.webp")';});
+     const muscle=$('studio-muscle-card');muscle.hidden=!['pushup','incline','row'].includes(mode);
+     $('studio-coach-eyebrow').textContent=seg.phase.includes('RONDA')?seg.phase:'ENTRENADOR GUIADO';
+     const round=seg.phase.match(/RONDA\s+(\d+)\s*\/\s*(\d+)/);
+     $('studio-series').textContent=round?'Ronda '+round[1]+' de '+round[2]:(seg.phase==='RECUPERACIÓN'?'Recuperación':'Calentamiento y movilidad');
+     $('studio-series-detail').textContent=round?state.data.plan.seconds+' segundos · '+(seg.exercise||''):seg.phase==='RECUPERACIÓN'?'Respira a tu ritmo':'Empieza con calma';
+
      $('coach-next-list').innerHTML=t.segments.slice(t.index,t.index+4).map((x,i)=>'<span class="'+(i===0?'active':'')+'">'+esc(x.title)+'</span>').join('');
      t.lastRenderedIndex=t.index;
      renderStudioRoutine();
    }
- const mm=String(Math.floor(Math.ceil(t.remaining)/60)).padStart(2,'0');const ss=String(Math.ceil(t.remaining)%60).padStart(2,'0');$('coach-timer').textContent=mm+':'+ss;$('coach-phase').textContent=seg.phase;$('coach-title').textContent=seg.title;$('coach-icon').innerHTML=uiIcon(seg.exercise?'activity':'sparkles');$('coach-tip').textContent=seg.tip;$('coach-position').textContent='Paso '+(t.index+1)+' de '+t.segments.length;$('coach-progress-fill').style.width=((t.index+(1-t.remaining/seg.seconds))/t.segments.length*100).toFixed(1)+'%';$('coach-play').textContent=t.playing?'Ⅱ Pausar':(t.started?'▶ Continuar':'▶ Iniciar');}
+ const mm=String(Math.floor(Math.ceil(t.remaining)/60)).padStart(2,'0');const ss=String(Math.ceil(t.remaining)%60).padStart(2,'0');$('coach-timer').textContent=mm+':'+ss;$('coach-phase').textContent=seg.phase;$('coach-title').textContent=seg.title;$('coach-icon').innerHTML=uiIcon(seg.exercise?'activity':'sparkles');$('coach-tip').textContent=seg.tip;$('coach-position').textContent='Paso '+(t.index+1)+' de '+t.segments.length;$('coach-progress-fill').style.width=((t.index+(1-t.remaining/seg.seconds))/t.segments.length*100).toFixed(1)+'%';$('coach-play').textContent=t.playing?'Ⅱ Pausar':(t.started?'▶ Continuar':'▶ Iniciar');const ring=document.querySelector('.studio-clock-circle');if(ring)ring.style.setProperty('--remaining',Math.max(0,Math.min(100,t.remaining/seg.seconds*100))+'%');}
  function stopTick(){const t=state.trainer;if(t){clearInterval(t.timer);t.timer=null;t.playing=false;}if('speechSynthesis' in window){try{speechSynthesis.cancel();}catch(e){}}}
  function tick(){const t=state.trainer;if(!t||!t.playing)return;const now=performance.now();const diff=Math.max(0,(now-t.lastTick)/1000);t.lastTick=now;t.remaining-=diff;t.activeSeconds+=diff;
   if(t.remaining<=0){nextCoach(true);return;}renderCoach();
@@ -228,6 +253,12 @@
   const stage=$('coach-stage'), overlay=$('coach-overlay');
   if(stage&&overlay){stage.replaceChildren(overlay);}
   $('train-goal-open').onclick=()=>tab('perfil');
+  $('studio-calendar').onclick=()=>tab('progreso');
+  $('studio-weight-chart').addEventListener('click',ev=>{if(ev.target.closest('#studio-measure-cta'))tab('progreso');});
+  $('studio-notifications').onclick=()=>{const d=state.data;const done=d?.workouts?.some(x=>x.day===today());if(!done){tab('entrenar');toast('Tu sesión de hoy está lista cuando tú quieras.');}else toast('Ya registraste una sesión hoy. ¡Bien hecho!');};
+  $('nav-habits').onclick=()=>{tab('inicio');setTimeout(()=>$('habit-constancy')?.closest('.habits-grid')?.scrollIntoView({behavior:'smooth',block:'center'}),60);};
+  $('nav-community').onclick=()=>toast('La comunidad todavía no está disponible. Tu información sigue siendo privada.');
+  $('nav-settings').onclick=()=>tab('perfil');
   $('studio-water-add').onclick=()=>{const h=state.data?.habits?.find(x=>x.day===today());saveHabit({water:Math.min(20,(Number(h?.water)||0)+1)});};
   $('view-entrenar').addEventListener('click',ev=>{const b=ev.target.closest('[data-studio-step]');if(b)jumpToStudioStep(Number(b.dataset.studioStep));});
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));

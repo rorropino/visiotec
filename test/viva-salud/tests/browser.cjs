@@ -47,6 +47,11 @@ const assert=require('assert');
  await page.waitForFunction(()=>document.querySelector('#meal-list').textContent.includes('Comida de prueba'));
  await page.click('button[data-tab=entrenar]');
  await page.waitForSelector('#view-entrenar.active');
+ await page.evaluate(()=>window.scrollTo(0,0));
+ await page.screenshot({path:'/tmp/viva-studio-full-desktop.png',fullPage:false});
+ assert(await page.$eval('.studio-streak-badge',x=>getComputedStyle(x).display!=='none'),'Header streak missing');
+ assert(await page.$eval('.studio-icon-button',x=>getComputedStyle(x).display!=='none'),'Header quick actions missing');
+
  await page.click('#open-coach');
  await page.waitForSelector('#coach-overlay:not([hidden])');
  const inline=await page.$eval('#coach-overlay',el=>({container:el.parentElement.id,position:getComputedStyle(el).position}));
@@ -69,6 +74,8 @@ const assert=require('assert');
  assert(await page.$eval('#coach-rest-visual',x=>!x.hidden),'Rest period must show breathing animation');
  await page.click('#coach-next');
  assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='pushup','Pushups must show wall pushup');
+ await page.screenshot({path:'/tmp/viva-fidelity-pushup.png',fullPage:false});
+
  assert(await page.$eval('#coach-sprite',x=>!x.hidden),'Character sprite must be visible');
  await page.click('#coach-play');
  await new Promise(r=>setTimeout(r,1300));

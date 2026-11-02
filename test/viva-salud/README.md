@@ -93,3 +93,8 @@ Esta versión no ofrece evaluación médica, diagnóstico, estimaciones de calor
 - Front: `/viva-salud/index.html`
 - API: `/viva-salud/api/index.php?action=...`
 - Datos: SQLite fuera de webroot. Identificador de usuario para partición de registros.
+
+### Fidelity pass v6
+- UI de entrenamiento refinada contra la referencia: topbar con acciones reales y racha calculada, navegación ampliada sin funciones falsas, panel central de entrenamiento visual con sprites reales, tarjetas siguientes y objetivo con progreso de sesiones real.
+- Estadísticas de peso solo con mediciones propias; ningún porcentaje inventado. Hidratación: volumen estimado de 250 ml/vaso (no meta de consumo prescrita).
+- La galería original de 25 miniaturas específicas pesa menos de 120 KB y no requiere red externa. La foto de atardecer usada en el lateral procede de https://images.unsplash.com/photo-1500534623283-312aade485b7 (Unsplash License).
