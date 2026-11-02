@@ -49,15 +49,35 @@ const assert=require('assert');
  await page.waitForSelector('#view-entrenar.active');
  await page.click('#open-coach');
  await page.waitForSelector('#coach-overlay:not([hidden])');
- await page.waitForFunction(()=>document.querySelector('#coach-demo')?.readyState>=2,{timeout:10000});
+ await page.waitForFunction(()=>window.VivaSprite?.getInfo().loaded && !document.querySelector('#coach-sprite').hidden,{timeout:12000});
+ assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='march','Warmup must show marching sprite');
+ const before=await page.$eval('#coach-sprite',el=>el.toDataURL());
+ await new Promise(r=>setTimeout(r,650));
+ const after=await page.$eval('#coach-sprite',el=>el.toDataURL());
+ assert(before!==after,'Sprite must advance through animation frames');
  await page.screenshot({path:'/tmp/viva-coach.png',fullPage:false});
-
+ await page.click('#coach-next');
+ assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='squat','First exercise must show chair squat');
+ assert((await page.$eval('#coach-title',x=>x.textContent)).toLowerCase().includes('sentadilla'));
+ await page.click('#coach-next');
+ assert(await page.$eval('#coach-rest-visual',x=>!x.hidden),'Rest period must show breathing animation');
+ await page.click('#coach-next');
+ assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='pushup','Pushups must show wall pushup');
+ assert(await page.$eval('#coach-sprite',x=>!x.hidden),'Character sprite must be visible');
  await page.click('#coach-play');
  await new Promise(r=>setTimeout(r,1300));
- assert(await page.$eval('#coach-demo',x=>x.currentTime)>0,'Trainer demonstration video did not play');
-
  const clock=await page.$eval('#coach-timer',el=>el.textContent);
  assert(clock!== '03:00','Timer did not start');
+ for(const [visual,expected] of [['rest',null],['sprite','bridge'],['rest',null],['sprite','birddog'],['rest',null],['video',null]]){
+   await page.click('#coach-next');
+   if(visual==='rest')assert(await page.$eval('#coach-rest-visual',x=>!x.hidden),'Rest breathing visual missing');
+   if(visual==='sprite')assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode===expected,'Wrong sprite '+expected);
+   if(visual==='video'){
+     assert(await page.$eval('#coach-demo',x=>!x.hidden),'Missing custom animation for heel raises');
+     await page.waitForFunction(()=>document.querySelector('#coach-demo').readyState>=2,{timeout:8000});
+   }
+ }
+
  await page.click('#coach-exit');
  await page.click('button[data-tab=progreso]');
  await page.waitForSelector('#view-progreso.active');
@@ -70,8 +90,19 @@ const assert=require('assert');
  await page.screenshot({path:'/tmp/viva-dashboard-mobile.png',fullPage:true});
  const horizontal=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+2);
  assert(!horizontal,'Unexpected horizontal scrolling on mobile');
+ await page.click('.mobile-nav button[data-tab=entrenar]');
+ await page.waitForSelector('#view-entrenar.active');
+ await page.click('#open-coach');
+ await page.waitForFunction(()=>window.VivaSprite?.getInfo().loaded && !document.querySelector('#coach-sprite').hidden);
+ const nextRect=await page.$eval('#coach-next',x=>{const r=x.getBoundingClientRect();return {top:r.top,bottom:r.bottom,width:r.width,viewport:window.innerHeight};});
+ assert(nextRect.top>=0 && nextRect.bottom<=nextRect.viewport,'Next button not visible on mobile: '+JSON.stringify(nextRect));
+ await page.screenshot({path:'/tmp/viva-coach-mobile.png',fullPage:false});
+ await page.click('#coach-next');
+ assert((await page.evaluate(()=>window.VivaSprite.getInfo())).mode==='squat','Mobile next must change exercise sprite');
+ await page.click('#coach-exit');
+
  assert(errors.length===0,'Browser JS errors: '+errors.join(' | '));
- console.log('PASS: browser register/profile/pantry/recipes/meals/training/timer/measurement/mobile layout');
+ console.log('PASS: browser + 5-sprite atlas, warmup, squat, rest, pushups, timer, recipes, measurements, responsive layout');
  }catch(e){console.error('FAIL:',e.message,errors);process.exitCode=1;}
  finally{if(browser)await browser.close();}
 })();

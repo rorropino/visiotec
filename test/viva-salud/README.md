@@ -2,6 +2,14 @@
 
 Aplicación web responsiva / PWA en **PHP 8.3+, SQLite, JavaScript y CSS**, aislada de otros sistemas. Se entrega como una **versión funcional de pruebas**, no una aplicación clínica certificada.
 
+## Entrenamiento guiado con sprites IA
+- Atlas WebP de **cinco movimientos y seis posiciones por movimiento**, creado a partir de secuencias de imágenes del proyecto: marcha, sentadilla a silla, flexión contra pared, puente de glúteos y bird dog.
+- Un animador Canvas local, sin dependencia externa, presenta la secuencia en bucle y cambia de ejercicio al pulsar Siguiente o al terminar el temporizador.
+- Descansos diferenciados por una animación de respiración; no se simula ejercicio durante el descanso.
+- Los demás movimientos cuentan con pequeños videos ilustrativos: plancha, talones, equilibrio apoyado, remo con banda y flexiones inclinadas.
+- El flujo integra voz, temporizador, registros de entrenamiento y accesibilidad móvil. Compatible con usuarios que prefieren movimiento reducido.
+- Los dibujos son **orientativos**, no certificación de técnica ni prescripción médica.
+
 ## Diseño PRO (segunda iteración)
 - Dashboard de estética cinematográfica verde lima, violeta y azul noche, con tarjetas en capas y vista móvil.
 - Fotografías locales comprimidas WebP de entrenamientos y comidas.

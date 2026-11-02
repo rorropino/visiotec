@@ -43,7 +43,7 @@
   $('today-workout-time').textContent=d.plan.approx_minutes;$('today-workout-rounds').textContent=d.plan.rounds;
   $('today-food-suggestion').textContent=d.recipes.length && d.pantry.length?d.recipes[0].name+' · '+d.recipes[0].time+' minutos':'Añade tus ingredientes para descubrir qué cocinar.';
   $('train-type').textContent=d.plan.type;$('train-minutes').textContent=d.plan.approx_minutes;$('train-rounds').textContent=d.plan.rounds;$('train-exercises').textContent=d.plan.exercises.length;$('train-level').textContent=p.experience.toUpperCase();
-  $('exercise-items').innerHTML=d.plan.exercises.map((e,i)=>'<div class="exercise-item"><div class="exercise-emoji">'+exerciseIcon(e.id)+'</div><div><strong>'+String(i+1).padStart(2,'0')+' · '+esc(e.name)+'</strong><small>'+esc(e.muscle)+'</small><p>'+esc(e.tip)+'</p></div></div>').join('');
+  $('exercise-items').innerHTML=d.plan.exercises.map((e,i)=>'<div class="exercise-item"><div class="exercise-emoji">'+(e.id==='sentadilla'||e.id==='pared'||e.id==='puente'||e.id==='bird'||e.id==='marcha' ? '<span aria-hidden="true" class="exercise-sprite-mini" style="background-position:0% '+({sentadilla:25,pared:50,puente:75,bird:100,marcha:0}[e.id])+'%"></span>':exerciseIcon(e.id))+'</div><div><strong>'+String(i+1).padStart(2,'0')+' · '+esc(e.name)+'</strong><small>'+esc(e.muscle)+'</small><p>'+esc(e.tip)+'</p></div></div>').join('');
   const h=d.habits.find(x=>x.day===today())||{water:0,sleep:null};$('water-count').textContent=h.water;$('sleep-hours').value=h.sleep??'';
   $('habit-constancy').textContent=weekly?weekly+' sesión'+(weekly===1?'':'es')+' esta semana. ¡Bien ahí!':'La primera sesión de la semana puede ser hoy.';
   $('pantry-count').textContent=d.pantry.length+' ingredientes';
@@ -109,16 +109,41 @@
  let ctx=null;
  function beep(){try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=660;g.gain.value=.055;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.12);}catch(e){}}
  function speak(s){if(!$('coach-voice').checked||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='es-CL';u.rate=1;u.pitch=1;speechSynthesis.speak(u);}catch(e){}}
- function buildSegments(plan){let seg=[{phase:'Calentamiento',title:'Activación suave',icon:'🌤',tip:'Marcha con suavidad, mueve hombros y articulaciones sin dolor. Respira con normalidad.',seconds:plan.warmup*60}];for(let round=1;round<=plan.rounds;round++){plan.exercises.forEach((e,i)=>{seg.push({phase:'RONDA '+round+' / '+plan.rounds,title:e.name,icon:e.icon,tip:e.tip+' Alternativa: '+e.easy,seconds:plan.seconds,exercise:e.name});if(round!==plan.rounds||i!==plan.exercises.length-1)seg.push({phase:'RECUPERACIÓN',title:'Descansa y respira',icon:'◷',tip:'Suelta los hombros y toma aire. Si lo necesitas, alarga la pausa.',seconds:plan.rest});});}
- seg.push({phase:'VUELTA A LA CALMA',title:'Recupera tu ritmo',icon:'🌿',tip:'Camina lento y estira suavemente, sin dolor.',seconds:plan.cooldown*60});return seg;}
- function startCoach(){if(!state.data)return;const p=state.data.plan;state.trainer={segments:buildSegments(p),index:0,remaining:0,playing:false,timer:null,started:false,activeSeconds:0,lastTick:null};state.trainer.remaining=state.trainer.segments[0].seconds;$('coach-overlay').hidden=false;$('coach-complete').hidden=true;$('coach-body')?.removeAttribute('hidden');renderCoach();beep();}
+ function buildSegments(plan){let seg=[{phase:'Calentamiento',title:'Calentamiento: marcha suave',icon:'🌤',tip:'Marcha en tu lugar alternando rodillas y brazos a ritmo cómodo. Después mueve suavemente los hombros. Debes poder conversar y respirar con normalidad.',seconds:plan.warmup*60}];for(let round=1;round<=plan.rounds;round++){plan.exercises.forEach((e,i)=>{seg.push({phase:'RONDA '+round+' / '+plan.rounds,title:e.name,icon:e.icon,tip:e.tip+' Alternativa: '+e.easy,seconds:plan.seconds,exercise:e.name});if(round!==plan.rounds||i!==plan.exercises.length-1)seg.push({phase:'RECUPERACIÓN',title:'Descansa y respira',icon:'◷',tip:'Suelta los hombros y toma aire. Si lo necesitas, alarga la pausa.',seconds:plan.rest});});}
+ seg.push({phase:'VUELTA A LA CALMA',title:'Vuelta a la calma: marcha lenta',icon:'🌿',tip:'Camina despacio y reduce el ritmo gradualmente. Respira sin forzar. Si estiras, hazlo suave y sin dolor.',seconds:plan.cooldown*60});return seg;}
+ function startCoach(){if(!state.data)return;window.VivaSprite?.start('coach-sprite');const p=state.data.plan;state.trainer={segments:buildSegments(p),index:0,remaining:0,playing:false,timer:null,started:false,activeSeconds:0,lastTick:null};state.trainer.remaining=state.trainer.segments[0].seconds;$('coach-overlay').hidden=false;$('coach-complete').hidden=true;$('coach-body')?.removeAttribute('hidden');renderCoach();beep();}
  function renderCoach(){const t=state.trainer;if(!t)return;const seg=t.segments[t.index];
    const demo=$('coach-demo');
    const name=String(seg.exercise||'').toLowerCase();
-   const video=name.includes('sentadilla')?'squat':name.includes('flexion')?'pushup':name.includes('puente')?'bridge':name.includes('bird')?'birddog':name.includes('marcha')?'march':name.includes('plancha')?'plank':name.includes('talones')?'march':'intro';
-   const url='./assets/media/demo-'+video+'.mp4';
-   if(demo.dataset.source!==url){demo.dataset.source=url;demo.src=url;demo.load();}
-   if(t.playing){demo.play().catch(()=>{});}else{demo.pause();}
+   let mode='march';
+   if(name.includes('sentadilla'))mode='squat';
+   else if(name.includes('flexiones inclinadas'))mode='incline';
+   else if(name.includes('flexion'))mode='pushup';
+   else if(name.includes('puente'))mode='bridge';
+   else if(name.includes('bird'))mode='birddog';
+   else if(name.includes('marcha'))mode='march';
+   else if(name.includes('plancha'))mode='plank';
+   else if(name.includes('talones'))mode='heels';
+   else if(name.includes('equilibrio'))mode='balance';
+   else if(name.includes('remo'))mode='row';
+   if(seg.phase==='RECUPERACIÓN')mode='rest';
+   if(seg.phase==='VUELTA A LA CALMA'||seg.phase==='Calentamiento')mode='march';
+   const sprite=window.VivaSprite?.hasMode(mode);
+   const canvas=$('coach-sprite');
+   const rest=$('coach-rest-visual');
+   const showRest=mode==='rest';
+   canvas.hidden=!sprite;rest.hidden=!showRest;demo.hidden=!!sprite||showRest;
+   if(sprite){
+     demo.pause();
+     window.VivaSprite?.setMode(mode);
+     canvas.setAttribute('aria-label','Animación del ejercicio: '+seg.title);
+   }else if(showRest){
+     demo.pause();
+   }else{
+     const url='./assets/media/demo-'+mode+'.mp4';
+     if(demo.dataset.source!==url){demo.dataset.source=url;demo.src=url;demo.load();}
+     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)demo.play().catch(()=>{});
+   }
    $('coach-next-list').innerHTML=t.segments.slice(t.index,t.index+4).map((x,i)=>'<span class="'+(i===0?'active':'')+'">'+esc(x.title)+'</span>').join('');
  const mm=String(Math.floor(Math.ceil(t.remaining)/60)).padStart(2,'0');const ss=String(Math.ceil(t.remaining)%60).padStart(2,'0');$('coach-timer').textContent=mm+':'+ss;$('coach-phase').textContent=seg.phase;$('coach-title').textContent=seg.title;$('coach-icon').innerHTML=uiIcon(seg.exercise?'activity':'sparkles');$('coach-tip').textContent=seg.tip;$('coach-position').textContent='Paso '+(t.index+1)+' de '+t.segments.length;$('coach-progress-fill').style.width=((t.index+(1-t.remaining/seg.seconds))/t.segments.length*100).toFixed(1)+'%';$('coach-play').textContent=t.playing?'Ⅱ Pausar':(t.started?'▶ Continuar':'▶ Iniciar');}
  function stopTick(){const t=state.trainer;if(t){clearInterval(t.timer);t.timer=null;t.playing=false;}if('speechSynthesis' in window){try{speechSynthesis.cancel();}catch(e){}}}
@@ -128,8 +153,8 @@
  function playPause(){const t=state.trainer;if(!t)return;if(t.playing){stopTick();renderCoach();return;}t.playing=true;t.started=true;t.lastTick=performance.now();t.timer=setInterval(tick,180);renderCoach();speak(t.segments[t.index].title);}
  function nextCoach(auto=false){const t=state.trainer;if(!t)return;const play=t.playing;clearInterval(t.timer);t.timer=null;t.index++;if(t.index>=t.segments.length){finishCoach();return;}t.remaining=t.segments[t.index].seconds;t.playing=false;if(play){t.playing=true;t.lastTick=performance.now();t.timer=setInterval(tick,180);}beep();renderCoach();if(play)speak(t.segments[t.index].title);}
  function prevCoach(){const t=state.trainer;if(!t)return;const play=t.playing;clearInterval(t.timer);t.index=Math.max(0,t.index-1);t.remaining=t.segments[t.index].seconds;t.playing=play;if(play){t.lastTick=performance.now();t.timer=setInterval(tick,180);}renderCoach();}
- function finishCoach(){const t=state.trainer;if(!t)return;stopTick();$('coach-body').hidden=true;$('coach-complete').hidden=false;beep();speak('¡Excelente trabajo! Finalizaste la sesión.');}
- function exitCoach(){stopTick();$('coach-demo').pause();state.trainer=null;$('coach-overlay').hidden=true;$('coach-body').hidden=false;}
+ function finishCoach(){const t=state.trainer;if(!t)return;stopTick();window.VivaSprite?.stop();$('coach-demo').pause();$('coach-body').hidden=true;$('coach-complete').hidden=false;beep();speak('¡Excelente trabajo! Finalizaste la sesión.');}
+ function exitCoach(){stopTick();$('coach-demo').pause();window.VivaSprite?.stop();state.trainer=null;$('coach-overlay').hidden=true;$('coach-body').hidden=false;}
  async function saveCoach(){const t=state.trainer;if(!t||t.activeSeconds<45){toast('Para guardar necesitas haber entrenado al menos 45 segundos.',true);return;}
   try{await api('workout',{rpe:Number($('coach-rpe').value),minutes:Math.max(1,Math.round(t.activeSeconds/60)),type:state.data.plan.type,exercises:state.data.plan.exercises.map(x=>x.name)});exitCoach();await refresh();toast('¡Sesión registrada! Tu próximo plan se adaptará.');tab('inicio');}catch(e){toast(e.message,true);}
  }

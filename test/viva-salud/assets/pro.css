@@ -260,3 +260,56 @@ input:focus,textarea:focus,select:focus{border-color:#b4f892!important}
 .pantry-panel h3 .ui-icon,.chart-panel h3 .ui-icon{color:#b7f0a0;vertical-align:middle;margin-right:4px}
 .nutrition-item .ui-icon{width:23px;height:23px;color:#baf2a9}
 @media(max-width:560px){.topbar .quick-search kbd{display:none}.topbar .quick-search{min-width:0}.topbar .top-actions>span{display:none}}
+
+
+/* Sprite character, one source image: six frames per exercise, five exercise rows. */
+.coach-demonstration{height:335px;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#251d3d,#141323 74%);border:1px solid rgba(202,255,114,.30)}
+.coach-sprite{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+.coach-demonstration video{width:100%;height:100%;object-fit:contain}
+.coach-demonstration video[hidden],.coach-sprite[hidden],.coach-rest-visual[hidden]{display:none!important}
+.coach-rest-visual{height:100%;width:100%;display:grid;place-items:center}
+.breath-orb{width:192px;height:192px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#98dcb763,#263957c7 65%,#61439966);border:2px solid #c1efc176;box-shadow:0 0 0 16px #a8e8a915,0 0 0 34px #c1b2ff0e,0 0 56px #a6ccbd65;animation:viva-breathe 4.5s ease-in-out infinite}
+.breath-orb span{font-family:Outfit,sans-serif;font-weight:750;text-align:center;font-size:23px;color:#d6fae4}
+@keyframes viva-breathe{0%,100%{transform:scale(.88)}50%{transform:scale(1.08)}}
+.coach-visual-note{max-width:520px;margin:11px auto 0;text-align:center;font-size:10px;line-height:1.5;color:#a9b5bb}
+.exercise-sprite-mini{height:46px;width:44px;display:block;background-image:url('./media/viva-sprites-pro.webp?v=4');background-size:600% 500%;background-repeat:no-repeat;border-radius:8px}
+.exercise-emoji:has(.exercise-sprite-mini){background:#171729}
+@media(max-width:560px){.coach-demonstration{height:245px}.breath-orb{width:135px;height:135px}.breath-orb span{font-size:18px}.coach-visual-note{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.breath-orb{animation:none!important}}
+
+
+/* Guided workout: ensure the countdown and Next are accessible on small screens. */
+.coach-modal{min-height:0;height:min(860px,95dvh);max-height:95dvh;overflow:hidden}
+.coach-header{flex:0 0 auto;padding:14px 22px}
+.coach-body{min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:13px 18px 4px}
+.coach-body>.eyebrow{margin-bottom:9px}
+.coach-body .coach-progress-track{width:100%;margin:0 0 6px}
+.coach-body .coach-demonstration{height:255px;min-height:180px;margin:10px auto 7px;flex-shrink:0}
+.coach-body h2{font-size:28px;margin:7px 0 4px}
+.coach-body>p{margin:2px auto 4px;line-height:1.35;max-width:550px}
+.coach-body .coach-clock{margin:5px auto 0;font-size:55px}
+.coach-next-list{margin:9px auto 0}
+.coach-visual-note{margin:7px auto 0}
+.coach-actions{position:sticky;bottom:0;margin:11px -7px 0;padding:12px 12px 10px;flex-shrink:0;z-index:3;display:flex;width:calc(100% + 14px);background:linear-gradient(0deg,#151d2dfd 60%,#151d2de8);border-top:1px solid #ffffff26;border-radius:13px}
+.coach-actions .btn{min-width:110px}
+.voice-toggle{margin:6px auto 9px!important}
+@media(max-width:560px){
+ .coach-modal{height:100dvh;min-height:100dvh;max-height:100dvh;border-radius:0}
+ .coach-header{padding:10px 14px}
+ .coach-header .brand-mark{height:35px;width:35px}
+ .coach-header .brand strong{font-size:16px}
+ .coach-header .brand small{font-size:8px}
+ .coach-body{padding:8px 12px 0}
+ .coach-body .coach-demonstration{height:200px;min-height:180px;margin:8px auto 4px}
+ .coach-body h2{font-size:24px;margin:6px 0 3px}
+ .coach-body>p{font-size:11px;line-height:1.35}
+ .coach-body .coach-clock{font-size:47px;margin:2px auto 0}
+ .coach-position{font-size:10px}
+ .coach-next-list{margin:6px auto 0;max-height:28px;overflow:hidden}
+ .coach-next-list span{font-size:9px}
+ .coach-visual-note{font-size:9px;line-height:1.2;margin:5px 2px}
+ .coach-actions{padding:9px 5px 9px;margin:7px -5px 0;gap:6px}
+ .coach-actions .btn{min-width:0;padding:11px 7px;font-size:11px;flex:1}
+ .coach-actions .btn-lime{flex:1.15}
+ .voice-toggle{margin:5px auto 8px!important}
+}

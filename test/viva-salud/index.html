@@ -11,9 +11,10 @@
  <link rel="preconnect" href="https://fonts.googleapis.com">
  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="./assets/styles.css?v=2">
- <link rel="stylesheet" href="./assets/pro.css?v=2">
- <script src="./assets/app.js?v=2" defer></script>
+ <link rel="stylesheet" href="./assets/styles.css?v=4">
+ <link rel="stylesheet" href="./assets/pro.css?v=4">
+ <script src="./assets/sprite-coach.js?v=4" defer></script>
+ <script src="./assets/app.js?v=4" defer></script>
 </head>
 <body>
  <div id="app" class="app-shell is-hidden">
@@ -109,7 +110,7 @@
  </div>
  <div class="coach-overlay" id="coach-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="coach-title">
   <div class="coach-modal"><div class="coach-header"><div class="brand"><div class="brand-mark">V<span>+</span></div><div><strong>VIVA</strong><small>ENTRENANDO</small></div></div><button class="close-coach" id="coach-exit" aria-label="Cerrar entrenamiento">✕</button></div>
-   <div class="coach-body" id="coach-body"><span class="eyebrow" id="coach-phase">PREPARACIÓN</span><div class="coach-progress-track"><div id="coach-progress-fill"></div></div><div class="coach-demonstration"><video id="coach-demo" muted loop playsinline preload="none" poster="./assets/media/training.webp" aria-label="Demostración animada del movimiento"></video><div class="demo-overlay"><span class="video-tag">✦ DEMOSTRACIÓN VISUAL</span><div class="coach-exercise-icon" id="coach-icon">✳</div></div></div><h2 id="coach-title">A tu ritmo.</h2><p id="coach-tip">Respira con calma.</p><div id="coach-timer" class="coach-clock">00:30</div><div id="coach-position" class="coach-position">Ejercicio 1 / 5</div><div class="coach-next-list" id="coach-next-list"></div><div class="coach-actions"><button class="btn btn-outline-light" id="coach-prev">↶ Anterior</button><button class="btn btn-lime" id="coach-play">▶ Iniciar</button><button class="btn btn-outline-light" id="coach-next">Siguiente →</button></div><div class="voice-toggle"><label><input type="checkbox" id="coach-voice" checked> Guía por voz</label></div></div>
+   <div class="coach-body" id="coach-body"><span class="eyebrow" id="coach-phase">PREPARACIÓN</span><div class="coach-progress-track"><div id="coach-progress-fill"></div></div><div class="coach-demonstration"><canvas id="coach-sprite" width="480" height="300" class="coach-sprite" role="img" aria-label="Animación de seis posiciones del ejercicio" hidden></canvas><div class="coach-rest-visual" id="coach-rest-visual" role="img" aria-label="Respira pausadamente durante el descanso" hidden><div class="breath-orb"><span>Inhala<br>y exhala</span></div></div><video id="coach-demo" muted loop playsinline preload="metadata" poster="./assets/media/training.webp" aria-label="Ilustración animada del movimiento" hidden></video><div class="demo-overlay"><span class="video-tag">✦ DEMOSTRACIÓN VISUAL</span><div class="coach-exercise-icon" id="coach-icon">✳</div></div></div><h2 id="coach-title">A tu ritmo.</h2><p id="coach-tip">Respira con calma.</p><div id="coach-timer" class="coach-clock">00:30</div><div id="coach-position" class="coach-position">Ejercicio 1 / 5</div><div class="coach-next-list" id="coach-next-list"></div><div class="coach-visual-note">Las animaciones son ilustrativas. Sigue las indicaciones y no fuerces movimientos con dolor.</div><div class="coach-actions"><button class="btn btn-outline-light" id="coach-prev">↶ Anterior</button><button class="btn btn-lime" id="coach-play">▶ Iniciar</button><button class="btn btn-outline-light" id="coach-next">Siguiente →</button></div><div class="voice-toggle"><label><input type="checkbox" id="coach-voice" checked> Guía por voz</label></div></div>
    <div class="coach-complete" id="coach-complete" hidden><span class="trophy">🏆</span><h2>¡Sesión terminada!</h2><p>Completar es ganar. Cuéntanos cómo se sintió para adaptar la próxima.</p><label for="coach-rpe">Esfuerzo percibido: <strong id="coach-rpe-label">6</strong> / 10</label><input id="coach-rpe" type="range" min="1" max="10" value="6"><div class="coach-finish-buttons"><button class="btn btn-lime" id="coach-save">Guardar sesión</button><button class="btn btn-outline-light" id="coach-discard">Salir sin guardar</button></div></div>
   </div>
  </div>
