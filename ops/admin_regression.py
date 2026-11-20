@@ -30,12 +30,12 @@ def post(body,fields,upload=False):
     assert status==200,('POST',fields.get('action'),status)
     return html
 a=get();assert 'Activar administrador' in a
-_,bad=request(ADMIN,{'action':'setup','csrf':'invalid','setup_code':'ci-test-only-code','password':'test-only-password-123','confirm':'test-only-password-123'})
+_,bad=request(ADMIN,{'action':'setup','csrf':'invalid','setup_code':'ci-test-only-code','password':'Admin123','confirm':'Admin123'})
 assert 'Sesión vencida' in bad
-a=post(a,{'action':'setup','setup_code':'ci-test-only-code','password':'test-only-password-123','confirm':'test-only-password-123'})
+a=post(a,{'action':'setup','setup_code':'ci-test-only-code','password':'Admin123','confirm':'Admin123'})
 assert 'Administrar proyectos' in a and 'Proyectos existentes' in a
 a=post(a,{'action':'logout'});assert 'Iniciar sesión' in a
-a=post(a,{'action':'login','password':'test-only-password-123'});assert 'Administrar proyectos' in a
+a=post(a,{'action':'login','password':'Admin123'});assert 'Administrar proyectos' in a
 print('Admin activation, session, logout, login and CSRF checks passed')
 a=get(ADMIN+'?view=categories')
 a=post(a,{'action':'save_category','id':'0','label':'QA Category','slug':'qa-category','group_type':'web','sort_order':'90'})
@@ -57,8 +57,8 @@ assert 'Proyecto guardado' in a and 'QA Edited Project' in get('/_qa-render.php'
 a=post(a,{'action':'delete_project','id':project,'confirm_delete':'ELIMINAR'});assert 'Proyecto eliminado' in a and 'QA Edited Project' not in get('/_qa-render.php')
 a=get(ADMIN+'?view=categories');a=post(a,{'action':'delete_category','id':cat});assert 'Categoría eliminada' in a and 'QA Category' not in a
 print('Category and project CRUD, visibility, uploaded image and public rendering passed')
-a=get(ADMIN+'?view=password');a=post(a,{'action':'password','current':'test-only-password-123','password':'new-test-only-password-456','confirm':'new-test-only-password-456'})
+a=get(ADMIN+'?view=password');a=post(a,{'action':'password','current':'Admin123','password':'NewQa456','confirm':'NewQa456'})
 assert 'Contraseña actualizada' in a
 a=post(a,{'action':'logout'});assert 'Iniciar sesión' in a
-a=post(a,{'action':'login','password':'new-test-only-password-456'});assert 'Administrar proyectos' in a
+a=post(a,{'action':'login','password':'NewQa456'});assert 'Administrar proyectos' in a
 print('Password change and re-login passed')
