@@ -1,0 +1,38 @@
+name: VisioTec portfolio - admin regression
+on:
+  push:
+    branches: [main]
+    paths: ['ops/admin_regression.py', '.github/workflows/portfolio-admin-test.yml', 'site/portfolio/**', 'site/portfolio-admin/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  admin-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-test-only-password
+          MYSQL_DATABASE: vt_test
+          MYSQL_USER: vt_test
+          MYSQL_PASSWORD: ci-test-only-password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: pdo_mysql, mbstring
+      - name: Test full administrator flow against disposable database
+        run: |
+          printf '%s\n' '<?php return ["db_host"=>"127.0.0.1","db_name"=>"vt_test","db_user"=>"vt_test","db_pass"=>"ci-test-only-password","setup_code"=>"ci-test-only-code"];' > site/portfolio/private/config.php
+          printf '%s\n' '<?php require __DIR__."/portfolio/lib.php"; echo vt_portfolio_markup(vt_ready());' > site/_qa-render.php
+          php -S 127.0.0.1:8767 -t site > /tmp/vt-admin-test.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          sleep 1
+          python3 ops/admin_regression.py
