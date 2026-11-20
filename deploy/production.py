@@ -1,7 +1,8 @@
 """Deploy public frontend only. Existing logo, backend and application files remain untouched."""
-import os,io,pathlib,posixpath as pp,stat,base64,hashlib,time,urllib.request
+import os,io,re,pathlib,posixpath as pp,stat,base64,hashlib,time,urllib.request
 import paramiko
-from migrate_php import migrate
+from migrate_php import migrate, lint
+from provision_portfolio import configure
 required=('CPANEL_HOST','CPANEL_PORT','CPANEL_USER','CPANEL_PROD_PATH','CPANEL_SSH_KEY')
 missing=[n for n in required if not os.environ.get(n)]
 if missing: raise SystemExit('Deployment not configured; missing GitHub secrets: '+', '.join(missing))
@@ -60,12 +61,20 @@ try:
     if len(indexes)!=1:raise RuntimeError('Cannot safely identify unique VisioTec entry file')
     entry=indexes[0];old=read(pp.join(target,entry))
     new_entry=(pathlib.Path('site')/'index.html').read_bytes()
-    if entry.endswith('.php'):new_entry=migrate(old,new_entry)
+    if not entry.endswith('.php'):raise RuntimeError('Portfolio requires existing PHP entry')
+    # Strip only our previously deployed wrapper before migrating original PHP.
+    old_for_migration=re.sub(br'<\?php /\* VT_PORTFOLIO_(?:START|END) \*/[\s\S]*?\?>\n?',b'',old)
+    new_entry=migrate(old_for_migration,new_entry)
+    start_code=b"<?php /* VT_PORTFOLIO_START */ require_once __DIR__.'/portfolio/lib.php'; ob_start(); ?>\n"
+    end_code=b"\n<?php /* VT_PORTFOLIO_END */ echo vt_portfolio_render((string)ob_get_clean()); ?>"
+    new_entry=start_code+new_entry+end_code
+    lint(new_entry)
     print('Production entry identified: '+entry,flush=True)
     if not exists(pp.join(target,'enviar.php')):raise RuntimeError('Existing contact endpoint missing')
     if not exists(pp.join(target,'assets/img/logo.png')):raise RuntimeError('Existing logo not found')
     backup=pp.join(pp.dirname(target),'.visiotec-backups',time.strftime('%Y%m%d-%H%M%S')+'-'+os.getenv('GITHUB_SHA','manual')[:8])
     mkdir(backup);sftp.chmod(backup,0o700)
+    configured=configure(sftp,client,target,exists,mkdir,write,read)
     root=pathlib.Path('site')
     files=[p for p in root.rglob('*') if p.is_file() and p.name!='index.html']+[root/'index.html']
     for local in files:
@@ -102,12 +111,22 @@ try:
         except Exception:
             if attempt==3:raise
             time.sleep(3)
+    # Confirm the admin is accessible without revealing secrets. A 503 means pending DB configuration.
+    try:
+        admin_page=http('portfolio-admin/'+q)
+        if b'Activar administrador' not in admin_page and b'Iniciar sesi' not in admin_page:raise RuntimeError('Unexpected admin page')
+        if b'data-portfolio-source="mysql"' not in http(q):raise RuntimeError('MySQL render not confirmed')
+        print('PORTFOLIO MYSQL ACTIVE; admin login/setup verified',flush=True)
+    except Exception as exc:
+        if configured:
+            print('PORTFOLIO DATABASE NOT VERIFIED; check runtime configuration',flush=True)
+        else:print('PORTFOLIO PENDING DB CONFIG; public fallback remains available',flush=True)
     print('Production HTTP verified; updated files:',len(changes))
 except Exception:
     for dest,prior in reversed(changes):
         if prior is None:sftp.remove(dest)
         else:
-            tmp=dest+'.rollback-stage';write(tmp,prior);sftp.posix_rename(tmp,dest)
+            tmp=pp.join(pp.dirname(dest),'.visiotec-rollback-'+os.urandom(8).hex()+('.php' if dest.endswith('.php') else '.tmp'));write(tmp,prior);sftp.posix_rename(tmp,dest)
     if changes:print('Rollback applied to modified files')
     raise
 finally:
