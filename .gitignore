@@ -9,3 +9,7 @@ known_hosts
 node_modules/
 __pycache__/
 *.pyc
+
+# Portfolio private server/CI runtime files
+site/portfolio/private/*
+!site/portfolio/private/.htaccess
