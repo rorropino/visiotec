@@ -21,6 +21,10 @@ jobs:
           CPANEL_PROD_PATH: ${{ secrets.CPANEL_PROD_PATH }}
           CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
           CPANEL_SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
         run: |
           python3 - <<'PY'
           import sys
@@ -28,7 +32,7 @@ jobs:
           from pathlib import Path
           ns={'__name__':'portfolio_diagnostic'}
           exec(Path('deploy/production.py').read_text().split('changes=[]',1)[0],ns)
-          import posixpath as pp, urllib.request, urllib.error, secrets, json, os, time
+          import posixpath as pp, urllib.request, urllib.error, secrets, json, os, time, base64
           sftp=ns['sftp'];client=ns['client'];exists=ns['exists'];write=ns['write']
           raw=pp.normpath(os.environ['CPANEL_PROD_PATH']);user=os.environ['CPANEL_USER']
           candidates=[raw]
@@ -37,6 +41,11 @@ jobs:
           if not target:raise RuntimeError('Portfolio directory not found')
           token=secrets.token_hex(32);name='vtdiag-'+secrets.token_hex(18)+'.php'
           path=pp.join(target,'portfolio',name)
+          candidate=pp.join(target,'portfolio','private','diag-'+secrets.token_hex(18)+'.php')
+          candidate_name=pp.basename(candidate)
+          db={k.lower():os.environ.get(k,'') for k in ('DB_HOST','DB_NAME','DB_USER','DB_PASS')}
+          db['db_host']=db['db_host'] or 'localhost'
+          have_candidate=all(db[k] for k in ('db_name','db_user','db_pass'))
           php="""<?php
           ini_set('display_errors','0');
           header('Cache-Control: no-store');header('Content-Type: application/json');
@@ -51,14 +60,29 @@ jobs:
             $r['markup']=strpos(vt_portfolio_markup($db),'data-portfolio-source="mysql"')!==false;
             $r['admin_initialized']=$db->query("SELECT setting_value FROM vt_settings WHERE setting_key='admin_hash'")->fetchColumn()!==false;
           } catch(Throwable $e){$r['error_type']=get_class($e);if($e instanceof PDOException){$r['sqlstate']=$e->errorInfo[0]??'unknown';$r['driver_code']=(int)($e->errorInfo[1]??0);}}
+          $candidate=__DIR__.'/private/CANDIDATE';
+          $r['github_secrets_available']=is_file($candidate);
+          if(is_file($candidate)){
+            try{
+              $g=require $candidate;$c=vt_config();
+              $r['github_secrets_match_runtime']=true;
+              foreach(['db_host','db_name','db_user','db_pass'] as $k){if(!hash_equals((string)$c[$k],(string)$g[$k]))$r['github_secrets_match_runtime']=false;}
+              $probe=new PDO('mysql:host='.$g['db_host'].';dbname='.$g['db_name'].';charset=utf8mb4',$g['db_user'],$g['db_pass'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+              $probe->query('SELECT 1');$r['github_secrets_connected']=true;
+            }catch(Throwable $e){$r['github_secrets_connected']=false;if($e instanceof PDOException){$r['github_secrets_driver_code']=(int)($e->errorInfo[1]??0);}}
+          }
           echo json_encode($r);
-          """.replace('TOKEN',token).encode()
+          """.replace('TOKEN',token).replace('CANDIDATE',candidate_name).encode()
           def fetch(path,headers=None):
               req=urllib.request.Request('https://www.visiotec.cl/'+path,headers={'Cache-Control':'no-cache','User-Agent':'VisioTec-check/3',**(headers or {})})
               try:
                   with urllib.request.urlopen(req,timeout=20) as resp:return resp.status,resp.read(200000)
               except urllib.error.HTTPError as e:return e.code,e.read(200000)
           try:
+              if have_candidate:
+                  encoded=base64.b64encode(json.dumps(db).encode()).decode()
+                  body=("<?php return json_decode(base64_decode('"+encoded+"'),true,512,JSON_THROW_ON_ERROR);").encode()
+                  write(candidate,body,0o600)
               write(path,php)
               status,body=fetch('portfolio/'+name,{'X-VT-Diag':token})
               if status==200:
@@ -69,6 +93,8 @@ jobs:
                   status,body=fetch(p+'?vt_check='+str(time.time_ns()))
                   print('HTTP',p or '/',status,'mysql=',b'data-portfolio-source="mysql"' in body,'setup=',b'Activar administrador' in body,'login=',b'Iniciar sesi' in body,'pending=',b'Configuraci' in body and b'pendiente' in body,flush=True)
           finally:
-              try:sftp.remove(path)
+              try:
+                  for p in (path,candidate):
+                      if exists(p):sftp.remove(p)
               finally:sftp.close();client.close()
           PY
