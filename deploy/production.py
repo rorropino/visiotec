@@ -6,10 +6,11 @@ missing=[n for n in required if not os.environ.get(n)]
 if missing: raise SystemExit('Deployment not configured; missing GitHub secrets: '+', '.join(missing))
 env=os.environ
 host=env['CPANEL_HOST'];port=int(env['CPANEL_PORT']);user=env['CPANEL_USER']
+raw_key=env['CPANEL_SSH_KEY'].replace('\\n','\n').replace('\r','')
 key=None
 for cls in (paramiko.RSAKey,paramiko.Ed25519Key,paramiko.ECDSAKey):
     try:
-        key=cls.from_private_key(io.StringIO(env['CPANEL_SSH_KEY']),password=env.get('CPANEL_SSH_PASSPHRASE') or None);break
+        key=cls.from_private_key(io.StringIO(raw_key),password=env.get('CPANEL_SSH_PASSPHRASE') or None);break
     except (ValueError,paramiko.SSHException):pass
 if key is None:raise SystemExit('Invalid configured SSH key')
 client=paramiko.SSHClient()

@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+secrets*.env
+*.pem
+*.ppk
+*.key
+known_hosts
+node_modules/
+__pycache__/
+*.pyc
