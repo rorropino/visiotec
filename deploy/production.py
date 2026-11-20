@@ -91,8 +91,10 @@ try:
     q='?deploy_check='+str(time.time_ns())
     for attempt in range(4):
         try:
-            assert b'solution.engine' in http(q) and b'data-filter' in http(q)
-            assert b'.project' in http('assets/css/visiotec-v2.css'+q)
+            page=http(q)
+            assert b'solution.engine' in page and b'data-filter' in page
+            assert b'visiotec-whatsapp-float' in page and b'https://wa.me/56977725352?' in page
+            assert b'.visiotec-whatsapp-float' in http('assets/css/visiotec-v2.css'+q)
             assert b'contact-form' in http('assets/js/visiotec-v2.js'+q)
             assert b'urlset' in http('sitemap.xml'+q)
             assert b'Privacidad' in http('privacidad.html'+q)
