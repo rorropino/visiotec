@@ -29,7 +29,7 @@ jobs:
           extensions: pdo_mysql, mbstring
       - name: Test full administrator flow against disposable database
         run: |
-          printf '%s\n' '<?php return ["db_host"=>"127.0.0.1","db_name"=>"vt_test","db_user"=>"vt_test","db_pass"=>"ci-test-only-password","setup_code"=>"ci-test-only-code"];' > site/portfolio/private/config.php
+          printf '%s\n' '<?php return ["db_host"=>"127.0.0.1","db_name"=>"vt_test","db_user"=>"vt_test","db_pass"=>"ci-test-only-password","setup_code_hash"=>hash("sha256","ci-test-only-code")];' > site/portfolio/private/config.php
           printf '%s\n' '<?php require __DIR__."/portfolio/lib.php"; echo vt_portfolio_markup(vt_ready());' > site/_qa-render.php
           php -S 127.0.0.1:8767 -t site > /tmp/vt-admin-test.log 2>&1 &
           server=$!

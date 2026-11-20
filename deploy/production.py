@@ -127,6 +127,11 @@ try:
                 if attempt==4:raise
                 time.sleep(2)
         print('PORTFOLIO MYSQL ACTIVE; admin login/setup verified',flush=True)
+        activation=pp.join(target,'portfolio','private','activation.php')
+        # Retire the original activation file only after confirming the new deployment.
+        if exists(activation):sftp.remove(activation)
+        if exists(activation):raise RuntimeError('Old activation file still exists')
+        print('Legacy activation file removed; activation proof is hashed and one-time',flush=True)
     except Exception:
         if original_config is not None and exists(config_path) and read(config_path)!=original_config:
             temp=pp.join(pp.dirname(config_path),'.rollback-'+os.urandom(8).hex()+'.php')

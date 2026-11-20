@@ -19,6 +19,10 @@ def configure(sftp,client,target,exists,mkdir,write,read):
         if not match:raise RuntimeError('Unknown private configuration format')
         current=json.loads(base64.b64decode(match.group(1),validate=True))
         updated={**current,**db}
+        # One-time high-entropy activation proof. Only its SHA-256 digest is versioned.
+        # The plaintext is not written to Git, Actions logs or the server.
+        updated.pop('setup_code',None)
+        updated['setup_code_hash']='aad0808c77f6ddcfd16bc20e5950eea0675b58d1137d34c139c01de4c4d6b04a'
         if current==updated:
             print('Runtime matches current GitHub database secrets',flush=True)
             return True

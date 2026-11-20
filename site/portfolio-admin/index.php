@@ -35,7 +35,8 @@ if($db&&$_SERVER['REQUEST_METHOD']==='POST'){
             $s=$db->prepare('SELECT attempts FROM vt_login_attempts WHERE fingerprint=?');$s->execute([$finger]);if((int)$s->fetchColumn()>8){http_response_code(429);fail('Demasiados intentos. Intenta nuevamente en 15 minutos.');}
             if($action==='setup'&&$mode==='setup'){
                 $code=(string)($_POST['setup_code']??'');
-                if(empty($config['setup_code'])||!hash_equals((string)$config['setup_code'],$code))fail('Código de activación incorrecto.');
+                $valid=isset($config['setup_code_hash'])?hash_equals((string)$config['setup_code_hash'],hash('sha256',$code)):(!empty($config['setup_code'])&&hash_equals((string)$config['setup_code'],$code));
+                if(!$valid)fail('Código de activación incorrecto.');
                 $p=password_field();if(!hash_equals($p,(string)($_POST['confirm']??'')))fail('Las contraseñas no coinciden.');
                 $s=$db->prepare("INSERT IGNORE INTO vt_settings(setting_key,setting_value) VALUES('admin_hash',?)");$s->execute([password_hash($p,PASSWORD_DEFAULT)]);if($s->rowCount()!==1)fail('Administrador ya configurado; inicia sesión.');
             }elseif($action==='login'&&$mode==='login'){
