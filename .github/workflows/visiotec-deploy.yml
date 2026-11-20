@@ -19,7 +19,8 @@ jobs:
         run: |
           node --check site/assets/js/visiotec-v2.js
           python3 deploy/validate.py
-          python3 -m py_compile deploy/production.py
+          python3 -m py_compile deploy/production.py deploy/migrate_php.py
+          python3 deploy/test_migrate.py
       - name: Browser regression
         run: |
           npm install --no-save --no-package-lock playwright

@@ -1,6 +1,7 @@
 """Deploy public frontend only. Existing logo, backend and application files remain untouched."""
 import os,io,pathlib,posixpath as pp,stat,base64,hashlib,time,urllib.request
 import paramiko
+from migrate_php import migrate
 required=('CPANEL_HOST','CPANEL_PORT','CPANEL_USER','CPANEL_PROD_PATH','CPANEL_SSH_KEY')
 missing=[n for n in required if not os.environ.get(n)]
 if missing: raise SystemExit('Deployment not configured; missing GitHub secrets: '+', '.join(missing))
@@ -58,7 +59,9 @@ try:
         if exists(p) and stat.S_ISREG(exists(p).st_mode) and same(read(p)):indexes.append(n)
     if len(indexes)!=1:raise RuntimeError('Cannot safely identify unique VisioTec entry file')
     entry=indexes[0];old=read(pp.join(target,entry))
-    if b'<?php' in old.lower() or b'<?=' in old:raise RuntimeError('Entry contains PHP logic; migrate manually to preserve backend')
+    new_entry=(pathlib.Path('site')/'index.html').read_bytes()
+    if entry.endswith('.php'):new_entry=migrate(old,new_entry)
+    print('Production entry identified: '+entry,flush=True)
     if not exists(pp.join(target,'enviar.php')):raise RuntimeError('Existing contact endpoint missing')
     if not exists(pp.join(target,'assets/img/logo.png')):raise RuntimeError('Existing logo not found')
     backup=pp.join(pp.dirname(target),'.visiotec-backups',time.strftime('%Y%m%d-%H%M%S')+'-'+os.getenv('GITHUB_SHA','manual')[:8])
@@ -69,15 +72,17 @@ try:
         rel=local.relative_to(root).as_posix(); dest=pp.join(target,entry if rel=='index.html' else rel)
         st=exists(dest)
         if st and not stat.S_ISREG(st.st_mode):raise RuntimeError('Non-regular destination: '+rel)
-        prior=read(dest) if st else None;data=local.read_bytes()
+        prior=read(dest) if st else None;data=new_entry if rel=='index.html' else local.read_bytes()
         if prior==data:continue
         mkdir(pp.dirname(dest))
         if prior is not None:
             saved=pp.join(backup,entry if rel=='index.html' else rel);mkdir(pp.dirname(saved));write(saved,prior,0o600)
-        tmp=dest+'.visiotec-stage'
+        tmp=pp.join(pp.dirname(dest),'.visiotec-stage-'+os.urandom(8).hex()+('.php' if dest.endswith('.php') else '.tmp'))
         if exists(tmp):raise RuntimeError('Stale staging file: '+rel)
         write(tmp,data)
-        try:sftp.posix_rename(tmp,dest)
+        try:
+            if prior is None:sftp.rename(tmp,dest)
+            else:sftp.posix_rename(tmp,dest)
         except Exception:
             if exists(tmp):sftp.remove(tmp)
             raise
