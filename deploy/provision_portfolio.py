@@ -4,13 +4,36 @@ def configure(sftp,client,target,exists,mkdir,write,read):
     import posixpath as pp
     directory=pp.join(target,'portfolio','private')
     config=pp.join(directory,'config.php')
-    if exists(config):
-        print('Existing private portfolio configuration preserved',flush=True)
-        return True
     env=os.environ
     db={k.lower():env.get(k,'') for k in ('DB_HOST','DB_NAME','DB_USER','DB_PASS')}
     if any(db[k] for k in ('db_name','db_user','db_pass')) and not all(db[k] for k in ('db_name','db_user','db_pass')):
         print('Incomplete DB secrets; MySQL configuration pending',flush=True);return False
+    if exists(config):
+        if not db['db_name']:
+            print('Existing private portfolio configuration preserved',flush=True)
+            return True
+        db['db_host']=db['db_host'] or 'localhost'
+        # Preserve the one-time setup code; rotate database fields only.
+        prior=read(config)
+        match=re.search(br"base64_decode\('([A-Za-z0-9+/=]+)'\)",prior)
+        if not match:raise RuntimeError('Unknown private configuration format')
+        current=json.loads(base64.b64decode(match.group(1),validate=True))
+        updated={**current,**db}
+        if current==updated:
+            print('Runtime matches current GitHub database secrets',flush=True)
+            return True
+        backup=pp.join(directory,'config-backup-'+secrets.token_hex(12)+'.php')
+        write(backup,prior,0o600)
+        body=("<?php\nreturn json_decode(base64_decode('"+base64.b64encode(json.dumps(updated).encode()).decode()+"'),true,512,JSON_THROW_ON_ERROR);\n").encode()
+        tmp=pp.join(directory,'.config-'+secrets.token_hex(10)+'.php')
+        try:
+            write(tmp,body,0o600)
+            if read(tmp)!=body:raise RuntimeError('Private configuration staging failed')
+            sftp.posix_rename(tmp,config)
+        finally:
+            if exists(tmp):sftp.remove(tmp)
+        print('Portfolio database configuration synchronized',flush=True)
+        return True
     if not db['db_name']:
         account=env['CPANEL_USER']
         if not re.fullmatch(r'[A-Za-z0-9_]{1,16}',account):print('Automatic MySQL provisioning unavailable: account format',flush=True);return False

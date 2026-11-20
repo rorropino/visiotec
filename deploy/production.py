@@ -74,6 +74,8 @@ try:
     if not exists(pp.join(target,'assets/img/logo.png')):raise RuntimeError('Existing logo not found')
     backup=pp.join(pp.dirname(target),'.visiotec-backups',time.strftime('%Y%m%d-%H%M%S')+'-'+os.getenv('GITHUB_SHA','manual')[:8])
     mkdir(backup);sftp.chmod(backup,0o700)
+    config_path=pp.join(target,'portfolio','private','config.php')
+    original_config=read(config_path) if exists(config_path) else None
     configured=configure(sftp,client,target,exists,mkdir,write,read)
     root=pathlib.Path('site')
     files=[p for p in root.rglob('*') if p.is_file() and p.name!='index.html']+[root/'index.html']
@@ -113,14 +115,24 @@ try:
             time.sleep(3)
     # Confirm the admin is accessible without revealing secrets. A 503 means pending DB configuration.
     try:
-        admin_page=http('portfolio-admin/'+q)
-        if b'Activar administrador' not in admin_page and b'Iniciar sesi' not in admin_page:raise RuntimeError('Unexpected admin page')
-        if b'data-portfolio-source="mysql"' not in http(q):raise RuntimeError('MySQL render not confirmed')
+        for attempt in range(5):
+            try:
+                admin_page=http('portfolio-admin/?vt_db='+str(time.time_ns()))
+                if b'Activar administrador' not in admin_page and b'Iniciar sesi' not in admin_page:raise RuntimeError('Unexpected admin page')
+                live=http('?vt_db='+str(time.time_ns()))
+                if b'data-portfolio-source="mysql"' not in live:raise RuntimeError('MySQL render not confirmed')
+                print('Public database-backed project cards:',live.count(b'class="project reveal"'),flush=True)
+                break
+            except Exception:
+                if attempt==4:raise
+                time.sleep(2)
         print('PORTFOLIO MYSQL ACTIVE; admin login/setup verified',flush=True)
-    except Exception as exc:
-        if configured:
-            print('PORTFOLIO DATABASE NOT VERIFIED; check runtime configuration',flush=True)
-        else:print('PORTFOLIO PENDING DB CONFIG; public fallback remains available',flush=True)
+    except Exception:
+        if original_config is not None and exists(config_path) and read(config_path)!=original_config:
+            temp=pp.join(pp.dirname(config_path),'.rollback-'+os.urandom(8).hex()+'.php')
+            write(temp,original_config,0o600);sftp.posix_rename(temp,config_path)
+            print('Previous database configuration restored',flush=True)
+        raise RuntimeError('Portfolio MySQL or admin verification failed')
     print('Production HTTP verified; updated files:',len(changes))
 except Exception:
     for dest,prior in reversed(changes):
