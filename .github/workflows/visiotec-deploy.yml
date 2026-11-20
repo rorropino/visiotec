@@ -1,0 +1,49 @@
+name: VisioTec web - production
+on:
+  push:
+    branches: [main, redesign-v2]
+    paths: ['site/**', 'deploy/**', 'qa/**', '.github/workflows/visiotec-deploy.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: visiotec-web-${{ github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate frontend
+        run: |
+          node --check site/assets/js/visiotec-v2.js
+          python3 deploy/validate.py
+          python3 -m py_compile deploy/production.py
+      - name: Browser regression
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8766 --bind 127.0.0.1 -d site >/tmp/visiotec-http.log 2>&1 &
+          server=$!
+          trap 'kill $server 2>/dev/null || true' EXIT
+          sleep 1
+          node qa/smoke.cjs
+  deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install --quiet 'paramiko>=3,<5'
+      - name: Deploy safely
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_PORT: ${{ secrets.CPANEL_PORT }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_PROD_PATH: ${{ secrets.CPANEL_PROD_PATH }}
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
+          CPANEL_KNOWN_HOSTS: ${{ secrets.CPANEL_KNOWN_HOSTS }}
+        run: python3 deploy/production.py
