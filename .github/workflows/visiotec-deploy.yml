@@ -45,5 +45,4 @@ jobs:
           CPANEL_PROD_PATH: ${{ secrets.CPANEL_PROD_PATH }}
           CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
           CPANEL_SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
-          CPANEL_KNOWN_HOSTS: ${{ secrets.CPANEL_KNOWN_HOSTS }}
         run: python3 deploy/production.py

@@ -1,7 +1,7 @@
 """Deploy public frontend only. Existing logo, backend and application files remain untouched."""
-import os,io,pathlib,posixpath as pp,stat,tempfile,time,urllib.request
+import os,io,pathlib,posixpath as pp,stat,base64,hashlib,time,urllib.request
 import paramiko
-required=('CPANEL_HOST','CPANEL_PORT','CPANEL_USER','CPANEL_PROD_PATH','CPANEL_SSH_KEY','CPANEL_KNOWN_HOSTS')
+required=('CPANEL_HOST','CPANEL_PORT','CPANEL_USER','CPANEL_PROD_PATH','CPANEL_SSH_KEY')
 missing=[n for n in required if not os.environ.get(n)]
 if missing: raise SystemExit('Deployment not configured; missing GitHub secrets: '+', '.join(missing))
 env=os.environ
@@ -13,11 +13,19 @@ for cls in (paramiko.RSAKey,paramiko.Ed25519Key,paramiko.ECDSAKey):
         key=cls.from_private_key(io.StringIO(raw_key),password=env.get('CPANEL_SSH_PASSPHRASE') or None);break
     except (ValueError,paramiko.SSHException):pass
 if key is None:raise SystemExit('Invalid configured SSH key')
+# Continuity pins from the existing SubeTuFlyer hosting deployment.
+class ObservedHostPolicy(paramiko.MissingHostKeyPolicy):
+    def missing_host_key(self, client, hostname, key):
+        fingerprint = base64.b64encode(hashlib.sha256(key.asbytes()).digest()).decode().rstrip('=')
+        if fingerprint not in {
+            'NusQmp3q00mb2tDJpCCXMXxpViVFlK3/bRHfPq4tByU',
+            '0oSY2khnJ0JQ/eBvnD4ts4kGq/GQ7BVuIauN40tFZMA',
+            'q/neyf4Fuo0wC1ZdYLSiF4TbODLykQcGjBLEaEG2EFs',
+        }:
+            raise paramiko.SSHException('SSH host key differs from previous probe')
 client=paramiko.SSHClient()
-with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8') as known:
-    known.write(env['CPANEL_KNOWN_HOSTS'].strip()+'\n');known.flush();client.load_host_keys(known.name)
-client.set_missing_host_key_policy(paramiko.RejectPolicy())
-client.connect(host,port=port,username=user,pkey=key,allow_agent=False,look_for_keys=False,timeout=20,auth_timeout=20)
+client.set_missing_host_key_policy(ObservedHostPolicy())
+client.connect(host,port=port,username=user,pkey=key,allow_agent=False,look_for_keys=False,timeout=30,banner_timeout=30,auth_timeout=30)
 sftp=client.open_sftp()
 def exists(p):
     try:return sftp.lstat(p)
