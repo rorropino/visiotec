@@ -1,0 +1,74 @@
+name: VisioTec portfolio - live diagnostics
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/portfolio-diagnostic.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install --quiet 'paramiko>=3,<5'
+      - name: Check database and admin without exposing credentials
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_PORT: ${{ secrets.CPANEL_PORT }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_PROD_PATH: ${{ secrets.CPANEL_PROD_PATH }}
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
+        run: |
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0,'deploy')
+          from pathlib import Path
+          ns={'__name__':'portfolio_diagnostic'}
+          exec(Path('deploy/production.py').read_text().split('changes=[]',1)[0],ns)
+          import posixpath as pp, urllib.request, urllib.error, secrets, json, os, time
+          sftp=ns['sftp'];client=ns['client'];exists=ns['exists'];write=ns['write']
+          raw=pp.normpath(os.environ['CPANEL_PROD_PATH']);user=os.environ['CPANEL_USER']
+          candidates=[raw]
+          if raw.startswith('/home/'+user+'/'):candidates.append(raw[len('/home/'+user):])
+          target=next((p for p in candidates if exists(pp.join(p,'portfolio','lib.php'))),None)
+          if not target:raise RuntimeError('Portfolio directory not found')
+          token=secrets.token_hex(32);name='vtdiag-'+secrets.token_hex(18)+'.php'
+          path=pp.join(target,'portfolio',name)
+          php="""<?php
+          ini_set('display_errors','0');
+          header('Cache-Control: no-store');header('Content-Type: application/json');
+          if(!hash_equals('TOKEN', $_SERVER['HTTP_X_VT_DIAG']??'')){http_response_code(404);exit;}
+          $r=['php'=>PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION,'pdo_mysql'=>extension_loaded('pdo_mysql'),'mbstring'=>extension_loaded('mbstring'),'config_file'=>is_file(__DIR__.'/private/config.php'),'config_readable'=>is_readable(__DIR__.'/private/config.php')];
+          try {
+            require __DIR__.'/lib.php';
+            $c=vt_config();$r['config_valid']=true;
+            $db=vt_db();$r['connected']=true;
+            $db=vt_ready();$r['initialized']=true;
+            $r['project_count']=count(vt_projects($db));
+            $r['markup']=strpos(vt_portfolio_markup($db),'data-portfolio-source="mysql"')!==false;
+            $r['admin_initialized']=$db->query("SELECT setting_value FROM vt_settings WHERE setting_key='admin_hash'")->fetchColumn()!==false;
+          } catch(Throwable $e){$r['error_type']=get_class($e);if($e instanceof PDOException){$r['sqlstate']=$e->errorInfo[0]??'unknown';$r['driver_code']=(int)($e->errorInfo[1]??0);}}
+          echo json_encode($r);
+          """.replace('TOKEN',token).encode()
+          def fetch(path,headers=None):
+              req=urllib.request.Request('https://www.visiotec.cl/'+path,headers={'Cache-Control':'no-cache','User-Agent':'VisioTec-check/3',**(headers or {})})
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as resp:return resp.status,resp.read(200000)
+              except urllib.error.HTTPError as e:return e.code,e.read(200000)
+          try:
+              write(path,php)
+              status,body=fetch('portfolio/'+name,{'X-VT-Diag':token})
+              if status==200:
+                  try:print('Database diagnostic:',json.dumps(json.loads(body)),flush=True)
+                  except ValueError:print('Diagnostic did not return JSON',flush=True)
+              else:print('Diagnostic HTTP',status,flush=True)
+              for p in ['','portfolio-admin/','portfolio-admin/index.php','portfolio/private/config.php']:
+                  status,body=fetch(p+'?vt_check='+str(time.time_ns()))
+                  print('HTTP',p or '/',status,'mysql=',b'data-portfolio-source="mysql"' in body,'setup=',b'Activar administrador' in body,'login=',b'Iniciar sesi' in body,'pending=',b'Configuraci' in body and b'pendiente' in body,flush=True)
+          finally:
+              try:sftp.remove(path)
+              finally:sftp.close();client.close()
+          PY
